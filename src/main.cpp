@@ -1,6 +1,6 @@
 #include "platform.h"
 
-#include <thread>
+#include <algorithm>
 
 int GameMain(Platform & platform)
 {
@@ -34,5 +34,9 @@ int GameMain(Platform & platform)
         case '2':      ++y; break;
         case '3': ++x; ++y; break;
         }
+        x = std::max(x, 0);
+        y = std::max(y, 0);
+        x = std::min(x, Platform::WIDTH-1);
+        y = std::min(y, Platform::HEIGHT-1);
     }
 }

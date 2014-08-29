@@ -17,7 +17,8 @@ public:
         SetConsoleTitleA("CONSOLE");
         Sleep(40);
         console = FindWindowA(nullptr, "CONSOLE");
-        
+        SetConsoleTitleA("");
+
         buffer = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, nullptr, CONSOLE_TEXTMODE_BUFFER, nullptr);
         SetConsoleActiveScreenBuffer(buffer);
 
