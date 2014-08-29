@@ -4,20 +4,31 @@
 
 int GameMain(Platform & platform)
 {
-    Screen screen = {"Roguelike Experiments", {
+    Color colors[] = {
         {0x00,0x00,0x00}, {0x20,0x20,0xc0}, {0x20,0xc0,0x20}, {0x20,0xc0,0xc0}, {0xc0,0x20,0x20}, {0xc0,0x20,0xc0}, {0xc0,0xc0,0x20}, {0xc0,0xc0,0xc0},
-        {0x40,0x40,0x40}, {0x40,0x40,0xff}, {0x40,0xff,0x40}, {0x40,0xff,0xff}, {0xff,0x40,0x40}, {0xff,0x40,0xff}, {0xff,0xff,0x40}, {0xff,0xff,0xff},
-    }, {}, 0, 0};
+        {0x40,0x40,0x40}, {0x40,0x40,0xff}, {0x40,0xff,0x40}, {0x40,0xff,0xff}, {0xff,0x40,0x40}, {0xff,0x40,0xff}, {0xff,0xff,0x40}, {0xff,0xff,0xff}
+    };
+    platform.SetPalette(colors);
 
-    screen.PutChar(5,2,'X',4);
-    screen.PutChar(6,2,'Y',2);
-    screen.PutChar(7,2,'Z',1);
-    screen.PutChar(5,4,'X',4+8);
-    screen.PutChar(6,4,'Y',2+8);
-    screen.PutChar(7,4,'Z',1+8);
-    screen.SetCursor(5,2);
+    int x=5, y=5;
+    while(true)
+    {
+        Screen screen = {"Roguelike Experiments", {}, x, y};
+        screen.PutChar(x, y, '@', 14);
+        platform.ShowScreen(screen);
 
-    platform.Show(screen);
-    std::this_thread::sleep_for(std::chrono::seconds(20));
-    return 0;
+        switch(platform.GetChar())
+        {
+        case 'Q': return 0;
+        case '7': --x; --y; break;
+        case '8':      --y; break;
+        case '9': ++x; --y; break;
+        case '4': --x;      break;
+        case '5':           break;
+        case '6': ++x;      break;
+        case '1': --x; ++y; break;
+        case '2':      ++y; break;
+        case '3': ++x; ++y; break;
+        }
+    }
 }

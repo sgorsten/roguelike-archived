@@ -1,5 +1,7 @@
 #include "../platform.h"
 
+#include <stdexcept>
+
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
@@ -18,6 +20,15 @@ public:
         
         buffer = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, nullptr, CONSOLE_TEXTMODE_BUFFER, nullptr);
         SetConsoleActiveScreenBuffer(buffer);
+
+        // Set window size and console buffer size
+        auto output = GetStdHandle(STD_OUTPUT_HANDLE);
+        CONSOLE_SCREEN_BUFFER_INFOEX info = {};
+        info.cbSize = sizeof(CONSOLE_SCREEN_BUFFER_INFOEX);
+        GetConsoleScreenBufferInfoEx(output, &info);
+        info.dwSize = info.dwMaximumWindowSize = {Screen::WIDTH, Screen::HEIGHT};
+        SetConsoleScreenBufferInfoEx(output, &info);
+        SetWindowPos(console, HWND_TOP, 0, 0, 1000, 1000, SWP_NOZORDER|SWP_NOMOVE);
     }
 
     ~WinPlatform()
@@ -26,19 +37,26 @@ public:
         FreeConsole();
     }
 
-    void Show(const Screen & screen) override
+    void SetPalette(const Color (&colors)[Color::NUM_COLORS]) override
     {
-        // Set palette and window size
+         // Set palette and window size
         auto output = GetStdHandle(STD_OUTPUT_HANDLE);
         CONSOLE_SCREEN_BUFFER_INFOEX info = {};
         info.cbSize = sizeof(CONSOLE_SCREEN_BUFFER_INFOEX);
         GetConsoleScreenBufferInfoEx(output, &info);
         info.dwSize = info.dwMaximumWindowSize = {Screen::WIDTH, Screen::HEIGHT};
-        for(int i=0; i<16; ++i)
+        for(int i=0; i<Color::NUM_COLORS; ++i)
         {
-            info.ColorTable[i] = RGB(screen.colors[i].red, screen.colors[i].green, screen.colors[i].blue);
+            info.ColorTable[i] = RGB(colors[i].red, colors[i].green, colors[i].blue);
         }
         SetConsoleScreenBufferInfoEx(output, &info);
+        SetWindowPos(console, HWND_TOP, 0, 0, 1000, 1000, SWP_NOZORDER|SWP_NOMOVE);
+    }
+
+    void ShowScreen(const Screen & screen) override
+    {
+        // Set console title
+        SetConsoleTitleA(screen.caption);
 
         // Set cells
         CHAR_INFO charInfo[Screen::WIDTH * Screen::HEIGHT] = {};
@@ -52,10 +70,23 @@ public:
 
         // Set cursor
         SetConsoleCursorPosition(buffer, {screen.cursorX, screen.cursorY});
+    }
 
-        // Force window to be large enough to show its contents
-        SetConsoleTitleA(screen.caption);
-        SetWindowPos(console, HWND_TOP, 0, 0, 1000, 1000, SWP_NOZORDER|SWP_NOMOVE);
+    int GetChar() override
+    {
+        while(true)
+        {
+            INPUT_RECORD input;
+            DWORD numRead;
+            if(!ReadConsoleInput(GetStdHandle(STD_INPUT_HANDLE), &input, 1, &numRead))
+            {
+                throw std::runtime_error("GetChar() failed.");
+            }
+            if(input.EventType == KEY_EVENT && input.Event.KeyEvent.bKeyDown)
+            {
+                return input.Event.KeyEvent.uChar.AsciiChar;
+            }
+        }
     }
 };
 

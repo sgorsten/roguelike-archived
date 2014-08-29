@@ -4,16 +4,19 @@
 #include <cstdint>
 #include <cstring>
 
+struct Color
+{ 
+    static const int NUM_COLORS = 16;
+    uint8_t red, green, blue; 
+};
+
 struct Screen
 {
-    struct Color { uint8_t red,green,blue; };
     struct Cell { int character, attribute; };
     
-    static const int NUM_COLORS = 16;
     static const int WIDTH = 80, HEIGHT = 25;
     
     const char * caption;
-    Color colors[NUM_COLORS];
     Cell cells[WIDTH * HEIGHT];
     int cursorX,cursorY;
 
@@ -31,7 +34,9 @@ struct Screen
 
 struct Platform
 {
-    virtual void Show(const Screen & screen) = 0;
+    virtual void SetPalette(const Color (&colors)[Color::NUM_COLORS]) = 0;
+    virtual void ShowScreen(const Screen & screen) = 0;
+    virtual int GetChar() = 0;
 };
 
 extern int GameMain(Platform & platform);
