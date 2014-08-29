@@ -4,7 +4,9 @@
 
 int GameMain(Platform & platform)
 {
-    Color colors[] = {
+    platform.SetCaption("Roguelike Experiments");
+
+    Platform::Color colors[] = {
         {0x00,0x00,0x00}, {0x20,0x20,0xc0}, {0x20,0xc0,0x20}, {0x20,0xc0,0xc0}, {0xc0,0x20,0x20}, {0xc0,0x20,0xc0}, {0xc0,0xc0,0x20}, {0xc0,0xc0,0xc0},
         {0x40,0x40,0x40}, {0x40,0x40,0xff}, {0x40,0xff,0x40}, {0x40,0xff,0xff}, {0xff,0x40,0x40}, {0xff,0x40,0xff}, {0xff,0xff,0x40}, {0xff,0xff,0xff}
     };
@@ -13,9 +15,11 @@ int GameMain(Platform & platform)
     int x=5, y=5;
     while(true)
     {
-        Screen screen = {"Roguelike Experiments", {}, x, y};
-        screen.PutChar(x, y, '@', 14);
-        platform.ShowScreen(screen);
+        Platform::Cell cells[Platform::WIDTH * Platform::HEIGHT] = {};
+        cells[y*Platform::WIDTH+x] = {'@', 14};
+        platform.ShowScreen(cells);
+
+        platform.SetCursor(x, y);
 
         switch(platform.GetChar())
         {

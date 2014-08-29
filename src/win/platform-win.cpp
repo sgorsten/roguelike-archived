@@ -26,7 +26,7 @@ public:
         CONSOLE_SCREEN_BUFFER_INFOEX info = {};
         info.cbSize = sizeof(CONSOLE_SCREEN_BUFFER_INFOEX);
         GetConsoleScreenBufferInfoEx(output, &info);
-        info.dwSize = info.dwMaximumWindowSize = {Screen::WIDTH, Screen::HEIGHT};
+        info.dwSize = info.dwMaximumWindowSize = {WIDTH, HEIGHT};
         SetConsoleScreenBufferInfoEx(output, &info);
         SetWindowPos(console, HWND_TOP, 0, 0, 1000, 1000, SWP_NOZORDER|SWP_NOMOVE);
     }
@@ -37,15 +37,20 @@ public:
         FreeConsole();
     }
 
-    void SetPalette(const Color (&colors)[Color::NUM_COLORS]) override
+    void SetCaption(const std::string & title) override
+    {
+        SetConsoleTitleA(title.c_str());
+    }
+
+    void SetPalette(const Color (&colors)[NUM_COLORS]) override
     {
          // Set palette and window size
         auto output = GetStdHandle(STD_OUTPUT_HANDLE);
         CONSOLE_SCREEN_BUFFER_INFOEX info = {};
         info.cbSize = sizeof(CONSOLE_SCREEN_BUFFER_INFOEX);
         GetConsoleScreenBufferInfoEx(output, &info);
-        info.dwSize = info.dwMaximumWindowSize = {Screen::WIDTH, Screen::HEIGHT};
-        for(int i=0; i<Color::NUM_COLORS; ++i)
+        info.dwSize = info.dwMaximumWindowSize = {WIDTH, HEIGHT};
+        for(int i=0; i<NUM_COLORS; ++i)
         {
             info.ColorTable[i] = RGB(colors[i].red, colors[i].green, colors[i].blue);
         }
@@ -53,23 +58,22 @@ public:
         SetWindowPos(console, HWND_TOP, 0, 0, 1000, 1000, SWP_NOZORDER|SWP_NOMOVE);
     }
 
-    void ShowScreen(const Screen & screen) override
+    void SetCursor(int x, int y) override
     {
-        // Set console title
-        SetConsoleTitleA(screen.caption);
+        SetConsoleCursorPosition(buffer, {x, y});
+    }
 
+    void ShowScreen(const Cell (&cells)[WIDTH*HEIGHT]) override
+    {
         // Set cells
-        CHAR_INFO charInfo[Screen::WIDTH * Screen::HEIGHT] = {};
-        for(int i=0; i<Screen::WIDTH * Screen::HEIGHT; ++i)
+        CHAR_INFO charInfo[WIDTH*HEIGHT] = {};
+        for(int i=0; i<WIDTH*HEIGHT; ++i)
         {
-            charInfo[i].Char.AsciiChar = screen.cells[i].character;
-            charInfo[i].Attributes = screen.cells[i].attribute;
+            charInfo[i].Char.AsciiChar = cells[i].character & 0x7f;
+            charInfo[i].Attributes = cells[i].attribute;
         }
-        SMALL_RECT rect = {0, 0, Screen::WIDTH, Screen::HEIGHT};
-        WriteConsoleOutput(buffer, charInfo, {Screen::WIDTH, Screen::HEIGHT}, {0, 0}, &rect);
-
-        // Set cursor
-        SetConsoleCursorPosition(buffer, {screen.cursorX, screen.cursorY});
+        SMALL_RECT rect = {0, 0, WIDTH, HEIGHT};
+        WriteConsoleOutput(buffer, charInfo, {WIDTH, HEIGHT}, {0, 0}, &rect);
     }
 
     int GetChar() override
