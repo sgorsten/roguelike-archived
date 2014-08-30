@@ -21,27 +21,21 @@ int2 min(const int2 & a, const int2 & b) { return {std::min(a.x,b.x), std::min(a
 
 struct Screen
 {
-    Platform::Cell cells[Platform::WIDTH * Platform::HEIGHT];
+    Glyph glyphs[CONSOLE_WIDTH * CONSOLE_HEIGHT];
 
     Screen() { Clear(); }
-    void Clear() { memset(cells, 0, sizeof(cells)); }
-    void PutChar(const int2 & coord, int character, int attribute) { PutChar(coord.x, coord.y, character, attribute); }
-    void PutChar(int x, int y, int character, int attribute)
+    void Clear() { memset(glyphs, 0, sizeof(glyphs)); }
+    void PutChar(const int2 & coord, int character, Color attribute) { PutChar(coord.x, coord.y, character, attribute); }
+    void PutChar(int x, int y, int character, Color attribute)
     {
-        if(x < 0 || y < 0 || x >= Platform::WIDTH || y >= Platform::HEIGHT) return;
-        cells[y * Platform::WIDTH + x] = {character, attribute};
+        if(x < 0 || y < 0 || x >= CONSOLE_WIDTH || y >= CONSOLE_HEIGHT) return;
+        glyphs[y * CONSOLE_WIDTH + x] = {attribute, character};
     }
 };
 
-int GameMain(Platform & platform)
+int GameMain()
 {
-    platform.SetCaption("Roguelike Experiments");
-
-    const Platform::Color colors[] = {
-        {0x00,0x00,0x00}, {0x20,0x20,0xc0}, {0x20,0xc0,0x20}, {0x20,0xc0,0xc0}, {0xc0,0x20,0x20}, {0xc0,0x20,0xc0}, {0xc0,0xc0,0x20}, {0xc0,0xc0,0xc0},
-        {0x40,0x40,0x40}, {0x40,0x40,0xff}, {0x40,0xff,0x40}, {0x40,0xff,0xff}, {0xff,0x40,0x40}, {0xff,0x40,0xff}, {0xff,0xff,0x40}, {0xff,0xff,0xff}
-    };
-    platform.SetPalette(colors);
+    SetTitle("Roguelike Experiments");
 
     const int2 directions[] = {{-1,1}, {0,1}, {1,1}, {-1,0}, {0,0}, {1,0}, {-1,-1}, {0,-1}, {1,-1}};
     int2 playerPos = {5,5};
@@ -50,20 +44,22 @@ int GameMain(Platform & platform)
         Screen screen;
         for(int x=2; x<78; ++x)
         {
-            screen.PutChar(x, 2, '#', 8);
-            screen.PutChar(x, 22, '#', 8);
+            screen.PutChar(x, 2, '#', Color::DkGray);
+            screen.PutChar(x, 22, '#', Color::DkGray);
         }
         for(int y=2; y<23; ++y)
         {
-            screen.PutChar(2, y, '#', 8);
-            screen.PutChar(77, y, '#', 8);
+            screen.PutChar(2, y, '#', Color::DkGray);
+            screen.PutChar(77, y, '#', Color::DkGray);
         }
-        screen.PutChar(playerPos, '@', 14);
-        platform.ShowScreen(screen.cells);
+        for(int i=1; i<16; ++i)
+        {
+            screen.PutChar(2+i, 3, '%', (Color)i);
+        }
+        screen.PutChar(playerPos, '@', Color::Yellow);
+        WriteOutput(screen.glyphs, playerPos.x, playerPos.y);
 
-        platform.SetCursor(playerPos.x, playerPos.y);
-
-        switch(int ch = platform.GetChar())
+        switch(int ch = ReadInput())
         {
         case 'Q': 
             return 0;
@@ -74,6 +70,6 @@ int GameMain(Platform & platform)
             break;
         }
         playerPos = max(playerPos, {0,0});
-        playerPos = min(playerPos, {Platform::WIDTH-1,Platform::HEIGHT-1});
+        playerPos = min(playerPos, {CONSOLE_WIDTH-1,CONSOLE_HEIGHT-1});
     }
 }

@@ -1,173 +1,157 @@
-#include "../platform.h"
-
-#include <fstream>
-#include <stdexcept>
+#include "platform.h"
 
 #include <SDL.h>
 #include <SDL_opengl.h>
+#include <iostream>
 
-class SdlPlatform : public Platform
+namespace
 {
-    static const uint8_t fontTable[256*128];
+    extern const uint8_t g_fontImage[256*128];
+    SDL_Window * g_sdlWindow;
+}
 
-    SDL_Window * window;
-    SDL_GLContext context;
-    Color colors[NUM_COLORS];
-    Cell cells[WIDTH*HEIGHT];
-    int cursorX, cursorY;
-    GLuint font;
-public:
-    SdlPlatform() : window(), context(), cursorX(), cursorY(), font()
+int main(int argc, char * argv[]) 
+{   
+    SDL_GLContext glContext = 0;
+    GLuint fontTexture = 0;
+    int result = -1;
+    try
     {
-        memset(colors, 0, sizeof(colors));
-        memset(cells, 0, sizeof(cells));
-
-        // Obtain a Window
+        // Open an SDL window
         if(SDL_Init(SDL_INIT_VIDEO)) throw std::runtime_error(std::string("Unable to initialize SDL: ") + SDL_GetError());
-        window = SDL_CreateWindow("", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 700, SDL_WINDOW_OPENGL);  
-        if(!window) throw std::runtime_error("Unable to open SDL window");
+        g_sdlWindow = SDL_CreateWindow("", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 700, SDL_WINDOW_OPENGL);  
+        if(!g_sdlWindow) throw std::runtime_error("Unable to open SDL window");
 
         // Obtain an OpenGL context
-        context = SDL_GL_CreateContext(window);
-        if(!context) throw std::runtime_error("Unable to create OpenGL context");
+        glContext = SDL_GL_CreateContext(g_sdlWindow);
+        if(!glContext) throw std::runtime_error("Unable to create OpenGL context");
     
-        glGenTextures(1, &font);
-        glBindTexture(GL_TEXTURE_2D, font);
+        // Load font texture
+        glGenTextures(1, &fontTexture);
+        glBindTexture(GL_TEXTURE_2D, fontTexture);
         glPixelTransferi(GL_RED_SCALE, 255);
         glPixelTransferi(GL_GREEN_SCALE, 255);
         glPixelTransferi(GL_BLUE_SCALE, 255);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 128, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, fontTable);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 128, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, g_fontImage);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);        
-    }
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);    
 
-    ~SdlPlatform()
+        result = GameMain();
+    }
+    catch(const std::exception & e)
     {
-        if(context) SDL_GL_DeleteContext(context);
-        if(window) SDL_DestroyWindow(window);
-        SDL_Quit();
+        std::cerr << "Unhandled exception caught: " << e.what() << std::endl;
     }
-
-    void Redraw() const
+    catch(...)
     {
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        glPushMatrix();
-        glOrtho(0, WIDTH, HEIGHT, 0, -1, +1);
-        glEnable(GL_TEXTURE_2D);
-        glBegin(GL_QUADS);
-        for(int y=0; y<HEIGHT; ++y)
-        {
-            for(int x=0; x<WIDTH; ++x)
-            {
-                auto & cell = cells[y*WIDTH+x];
-                int charX = cell.character % 32;
-                int charY = cell.character / 32;
-                float s0 = (float)(charX+0)*8 / 256;
-                float s1 = (float)(charX+1)*8 / 256;
-                float t0 = (float)(charY+0)*14 / 128;
-                float t1 = (float)(charY+1)*14 / 128;
-                auto & color = colors[cell.attribute];
-
-                if(cell.character)
-                {
-                    glColor3ub(color.red, color.green, color.blue);
-                    glTexCoord2f(s0,t0); glVertex2i(x+0, y+0);
-                    glTexCoord2f(s1,t0); glVertex2i(x+1, y+0);
-                    glTexCoord2f(s1,t1); glVertex2i(x+1, y+1);
-                    glTexCoord2f(s0,t1); glVertex2i(x+0, y+1);
-                }
-            }
-        }
-        glEnd();
-        glDisable(GL_TEXTURE_2D);
-        glBegin(GL_QUADS);
-        glColor3f(1,1,1);
-        glVertex2f(cursorX+0, cursorY+(float)12/14);
-        glVertex2f(cursorX+1, cursorY+(float)12/14);
-        glVertex2f(cursorX+1, cursorY+1);
-        glVertex2f(cursorX+0, cursorY+1);
-        glEnd();
-        glPopMatrix();
-
-        SDL_GL_SwapWindow(window);
+        std::cerr << "Unhandled exception caught!" << std::endl;
     }
 
-    void SetCaption(const std::string & title) override
-    {
-        SDL_SetWindowTitle(window, title.c_str());
-    }
-
-    void SetPalette(const Color (&colors)[NUM_COLORS]) override
-    {
-        memcpy(this->colors, colors, sizeof(colors));
-        Redraw();
-    }
-
-    void SetCursor(int x, int y) override
-    {
-        cursorX = x;
-        cursorY = y;
-        Redraw();
-    }
-
-    void ShowScreen(const Cell (&cells)[WIDTH*HEIGHT]) override
-    {
-        memcpy(this->cells, cells, sizeof(cells));
-        Redraw();
-    }
-
-    int GetChar() override
-    {
-        struct Binding { SDL_Keycode code; int lower, upper; };
-        static const Binding bindings[] = {
-            {SDLK_KP_0, '0', '0'},
-            {SDLK_KP_1, '1', '1'},
-            {SDLK_KP_2, '2', '2'},
-            {SDLK_KP_3, '3', '3'},
-            {SDLK_KP_4, '4', '4'},
-            {SDLK_KP_5, '5', '5'},
-            {SDLK_KP_6, '6', '6'},
-            {SDLK_KP_7, '7', '7'},
-            {SDLK_KP_8, '8', '8'},
-            {SDLK_KP_9, '9', '9'}
-        };
-
-        SDL_Event e;
-        while(true)
-        {
-            if(!SDL_WaitEvent(&e))
-                throw std::runtime_error("GetChar() failed.");
-
-            switch(e.type)
-            {
-            case SDL_KEYDOWN:
-                if(e.key.keysym.sym >= SDLK_a && e.key.keysym.sym <= SDLK_z)
-                    return (e.key.keysym.mod & KMOD_SHIFT) ? e.key.keysym.sym - 'a' + 'A' : e.key.keysym.sym;
-                if(e.key.keysym.sym >= SDLK_0 && e.key.keysym.sym <= SDLK_9)
-                    return e.key.keysym.sym;
-                for(auto & binding : bindings)
-                    if(e.key.keysym.sym == binding.code)
-                        return (e.key.keysym.mod & KMOD_SHIFT) ? binding.upper : binding.lower;
-                break;
-            case SDL_QUIT:
-                return 'Q';
-            }
-        }
-    }
-};
-
-int main(int argc, char * argv[])
-{
-    SdlPlatform platform;
-    return GameMain(platform);
+    if(fontTexture) glDeleteTextures(1, &fontTexture);
+    if(glContext) SDL_GL_DeleteContext(glContext);
+    if(g_sdlWindow) SDL_DestroyWindow(g_sdlWindow);
+    SDL_Quit();
+    return result;
 }
 
-const uint8_t SdlPlatform::fontTable[256*128] = {
+void SetTitle(const char * title)
+{
+    SDL_SetWindowTitle(g_sdlWindow, title);
+}
+
+void WriteOutput(const Glyph (&glyphs)[CONSOLE_WIDTH * CONSOLE_HEIGHT], int cursorX, int cursorY)
+{
+    const float colors[16][3] = {
+        {0.0f,0.0f,0.0f}, {0.0f,0.0f,0.5f}, {0.0f,0.5f,0.0f}, {0.0f,0.5f,0.5f}, {0.5f,0.0f,0.0f}, {0.5f,0.0f,0.5f}, {0.6f,0.3f,0.0f}, {0.6f,0.6f,0.6f},
+        {0.3f,0.3f,0.3f}, {0.0f,0.0f,1.0f}, {0.0f,1.0f,0.0f}, {0.0f,1.0f,1.0f}, {1.0f,0.0f,0.0f}, {1.0f,0.0f,1.0f}, {1.0f,1.0f,0.0f}, {1.0f,1.0f,1.0f}
+    };
+
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glPushMatrix();
+    glOrtho(0, CONSOLE_WIDTH, CONSOLE_HEIGHT, 0, -1, +1);
+    glEnable(GL_TEXTURE_2D);
+    glBegin(GL_QUADS);
+    for(int y=0; y<CONSOLE_HEIGHT; ++y)
+    {
+        for(int x=0; x<CONSOLE_WIDTH; ++x)
+        {
+            auto & glyph = glyphs[y*CONSOLE_WIDTH+x];
+            int charX = glyph.character % 32;
+            int charY = glyph.character / 32;
+            float s0 = (float)(charX+0)*8 / 256;
+            float s1 = (float)(charX+1)*8 / 256;
+            float t0 = (float)(charY+0)*14 / 128;
+            float t1 = (float)(charY+1)*14 / 128;
+
+            glColor3fv(colors[(int)glyph.color]);
+            glTexCoord2f(s0,t0); glVertex2i(x+0, y+0);
+            glTexCoord2f(s1,t0); glVertex2i(x+1, y+0);
+            glTexCoord2f(s1,t1); glVertex2i(x+1, y+1);
+            glTexCoord2f(s0,t1); glVertex2i(x+0, y+1);
+        }
+    }
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+    glBegin(GL_QUADS);
+    glColor3f(1,1,1);
+    glVertex2f(cursorX+0, cursorY+(float)12/14);
+    glVertex2f(cursorX+1, cursorY+(float)12/14);
+    glVertex2f(cursorX+1, cursorY+1);
+    glVertex2f(cursorX+0, cursorY+1);
+    glEnd();
+    glPopMatrix();
+
+    SDL_GL_SwapWindow(g_sdlWindow);
+}
+
+int ReadInput()
+{
+    struct Binding { SDL_Keycode code; int lower, upper; };
+    static const Binding bindings[] = {
+        {SDLK_KP_0, '0', '0'},
+        {SDLK_KP_1, '1', '1'},
+        {SDLK_KP_2, '2', '2'},
+        {SDLK_KP_3, '3', '3'},
+        {SDLK_KP_4, '4', '4'},
+        {SDLK_KP_5, '5', '5'},
+        {SDLK_KP_6, '6', '6'},
+        {SDLK_KP_7, '7', '7'},
+        {SDLK_KP_8, '8', '8'},
+        {SDLK_KP_9, '9', '9'}
+    };
+
+    SDL_Event e;
+    while(true)
+    {
+        if(!SDL_WaitEvent(&e))
+            throw std::runtime_error("GetChar() failed.");
+
+        switch(e.type)
+        {
+        case SDL_KEYDOWN:
+            if(e.key.keysym.sym >= SDLK_a && e.key.keysym.sym <= SDLK_z)
+                return (e.key.keysym.mod & KMOD_SHIFT) ? e.key.keysym.sym - 'a' + 'A' : e.key.keysym.sym;
+            if(e.key.keysym.sym >= SDLK_0 && e.key.keysym.sym <= SDLK_9)
+                return e.key.keysym.sym;
+            for(auto & binding : bindings)
+                if(e.key.keysym.sym == binding.code)
+                    return (e.key.keysym.mod & KMOD_SHIFT) ? binding.upper : binding.lower;
+            break;
+        case SDL_QUIT:
+            return 'Q';
+        }
+    }
+}
+
+
+
+namespace {
+    const uint8_t g_fontImage[256*128] = {
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -617,3 +601,4 @@ const uint8_t SdlPlatform::fontTable[256*128] = {
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 };
+}
