@@ -177,7 +177,7 @@
     <ClCompile Include="..\src\platform.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\platform.h" />
+    <ClInclude Include="..\src\roguelike.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,4 +1,4 @@
-#include "platform.h"
+#include "roguelike.h"
 
 #include <SDL.h>
 #include <SDL_opengl.h>
