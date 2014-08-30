@@ -38,7 +38,10 @@ int main(int argc, char * argv[])
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);    
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+        // Set up pixel-aligned orthographic projection
+        glOrtho(0, CONSOLE_WIDTH*8, CONSOLE_HEIGHT*14, 0, -1, +1);
 
         result = GameMain();
     }
@@ -63,7 +66,7 @@ void SetTitle(const char * title)
     SDL_SetWindowTitle(g_sdlWindow, title);
 }
 
-void WriteOutput(const Glyph (&glyphs)[CONSOLE_WIDTH * CONSOLE_HEIGHT], int cursorX, int cursorY)
+void WriteOutput(const Glyph (&glyphs)[CONSOLE_WIDTH * CONSOLE_HEIGHT], const int2 & cursor)
 {
     const float colors[16][3] = {
         {0.0f,0.0f,0.0f}, {0.0f,0.0f,0.5f}, {0.0f,0.5f,0.0f}, {0.0f,0.5f,0.5f}, {0.5f,0.0f,0.0f}, {0.5f,0.0f,0.5f}, {0.6f,0.3f,0.0f}, {0.6f,0.6f,0.6f},
@@ -72,8 +75,6 @@ void WriteOutput(const Glyph (&glyphs)[CONSOLE_WIDTH * CONSOLE_HEIGHT], int curs
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glPushMatrix();
-    glOrtho(0, CONSOLE_WIDTH, CONSOLE_HEIGHT, 0, -1, +1);
     glEnable(GL_TEXTURE_2D);
     glBegin(GL_QUADS);
     for(int y=0; y<CONSOLE_HEIGHT; ++y)
@@ -89,22 +90,22 @@ void WriteOutput(const Glyph (&glyphs)[CONSOLE_WIDTH * CONSOLE_HEIGHT], int curs
             float t1 = (float)(charY+1)*14 / 128;
 
             glColor3fv(colors[(int)glyph.color]);
-            glTexCoord2f(s0,t0); glVertex2i(x+0, y+0);
-            glTexCoord2f(s1,t0); glVertex2i(x+1, y+0);
-            glTexCoord2f(s1,t1); glVertex2i(x+1, y+1);
-            glTexCoord2f(s0,t1); glVertex2i(x+0, y+1);
+            glTexCoord2f(s0,t0); glVertex2i((x+0)*8, (y+0)*14);
+            glTexCoord2f(s1,t0); glVertex2i((x+1)*8, (y+0)*14);
+            glTexCoord2f(s1,t1); glVertex2i((x+1)*8, (y+1)*14);
+            glTexCoord2f(s0,t1); glVertex2i((x+0)*8, (y+1)*14);
         }
     }
     glEnd();
+
     glDisable(GL_TEXTURE_2D);
     glBegin(GL_QUADS);
     glColor3f(1,1,1);
-    glVertex2f(cursorX+0, cursorY+(float)12/14);
-    glVertex2f(cursorX+1, cursorY+(float)12/14);
-    glVertex2f(cursorX+1, cursorY+1);
-    glVertex2f(cursorX+0, cursorY+1);
+    glVertex2i((cursor.x+0)*8, cursor.y*14+12);
+    glVertex2i((cursor.x+1)*8, cursor.y*14+12);
+    glVertex2i((cursor.x+1)*8, cursor.y*14+14);
+    glVertex2i((cursor.x+0)*8, cursor.y*14+14);
     glEnd();
-    glPopMatrix();
 
     SDL_GL_SwapWindow(g_sdlWindow);
 }
