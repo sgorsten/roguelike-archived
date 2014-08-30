@@ -41,7 +41,7 @@ int main(int argc, char * argv[])
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
         // Set up pixel-aligned orthographic projection
-        glOrtho(0, CONSOLE_WIDTH*8, CONSOLE_HEIGHT*14, 0, -1, +1);
+        glOrtho(0, SCREEN_WIDTH*8, SCREEN_HEIGHT*14, 0, -1, +1);
 
         result = GameMain();
     }
@@ -66,7 +66,7 @@ void SetTitle(const char * title)
     SDL_SetWindowTitle(g_sdlWindow, title);
 }
 
-void WriteOutput(const Glyph (&glyphs)[CONSOLE_WIDTH * CONSOLE_HEIGHT], const int2 & cursor)
+void WriteOutput(const Glyph (&glyphs)[SCREEN_HEIGHT][SCREEN_WIDTH], const int2 & cursor)
 {
     const float colors[16][3] = {
         {0.0f,0.0f,0.0f}, {0.0f,0.0f,0.5f}, {0.0f,0.5f,0.0f}, {0.0f,0.5f,0.5f}, {0.5f,0.0f,0.0f}, {0.5f,0.0f,0.5f}, {0.6f,0.3f,0.0f}, {0.6f,0.6f,0.6f},
@@ -77,11 +77,11 @@ void WriteOutput(const Glyph (&glyphs)[CONSOLE_WIDTH * CONSOLE_HEIGHT], const in
 
     glEnable(GL_TEXTURE_2D);
     glBegin(GL_QUADS);
-    for(int y=0; y<CONSOLE_HEIGHT; ++y)
+    for(int y=0; y<SCREEN_HEIGHT; ++y)
     {
-        for(int x=0; x<CONSOLE_WIDTH; ++x)
+        for(int x=0; x<SCREEN_WIDTH; ++x)
         {
-            auto & glyph = glyphs[y*CONSOLE_WIDTH+x];
+            auto & glyph = glyphs[y][x];
             int charX = glyph.character % 32;
             int charY = glyph.character / 32;
             float s0 = (float)(charX+0)*8 / 256;

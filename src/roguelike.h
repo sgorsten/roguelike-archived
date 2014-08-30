@@ -4,11 +4,12 @@
 #include <cstdint>
 #include <algorithm>
 
-enum
-{
-    CONSOLE_WIDTH = 80,
-    CONSOLE_HEIGHT = 25 
-};
+const int SCREEN_WIDTH = 80;
+const int SCREEN_HEIGHT = 25;
+const int MAP_WIDTH = 60;
+const int MAP_HEIGHT = 22;
+const int MAP_OFFSET_X = 0;
+const int MAP_OFFSET_Y = 3;
 
 enum class Color : uint8_t { Black, Blue, Green, Cyan, Red, Magenta, Brown, Gray, DkGray, LtBlue, LtGreen, LtCyan, LtRed, LtMagenta, Yellow, White };
 enum class Direction : uint8_t { None, North, NorthEast, East, SouthEast, South, SouthWest, West, NorthWest };
@@ -50,7 +51,7 @@ inline int2 max(const int2 & a, const int2 & b) { return {std::max(a.x,b.x), std
 inline int2 min(const int2 & a, const int2 & b) { return {std::min(a.x,b.x), std::min(a.y,b.y)}; }
 
 void SetTitle(const char * title);
-void WriteOutput(const Glyph (&glyphs)[CONSOLE_WIDTH * CONSOLE_HEIGHT], const int2 & cursor);
+void WriteOutput(const Glyph (&glyphs)[SCREEN_HEIGHT][SCREEN_WIDTH], const int2 & cursor);
 int ReadInput();
 
 extern int GameMain();
