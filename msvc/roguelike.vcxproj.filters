@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp" />
-    <ClCompile Include="..\src\win\platform-sdl.cpp" />
+    <ClCompile Include="..\src\platform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\platform.h" />

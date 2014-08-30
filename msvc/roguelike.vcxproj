@@ -174,7 +174,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp" />
-    <ClCompile Include="..\src\win\platform-sdl.cpp" />
+    <ClCompile Include="..\src\platform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\platform.h" />
