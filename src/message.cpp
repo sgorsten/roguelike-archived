@@ -52,7 +52,7 @@ MessageBuffer & MessageBuffer::Subject(const Actor & actor)
     }
 
     lastActors[(int)actor.gender] = &actor;    
-    return (*this)(actor.noun.indefArticle)(actor.noun.singular);
+    return (*this)(actor.race->noun.indefArticle)(actor.race->noun.singular);
 }
 
 MessageBuffer & MessageBuffer::Object(const Actor & actor)
@@ -71,9 +71,15 @@ MessageBuffer & MessageBuffer::Object(const Actor & actor)
         case Gender::Male: return (*this)("him");
         }
     }
+    lastActors[(int)actor.gender] = &actor;
 
-    lastActors[(int)actor.gender] = &actor;  
-    return (*this)(actor.noun.indefArticle)(actor.noun.singular);
+    // If the actor is of the opposite gender as the player, mention the gender explicitly
+    if(actor.gender != Gender::Neuter && actor.gender != self->gender)
+    {
+        return (*this)(actor.gender == Gender::Male ? "a male" : "a female")(actor.race->noun.singular);
+    }
+
+    return (*this)(actor.race->noun.indefArticle)(actor.race->noun.singular);
 }   
 
 MessageBuffer & MessageBuffer::operator()(const Actor & actor, const Verb & verb)

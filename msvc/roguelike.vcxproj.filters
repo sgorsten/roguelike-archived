@@ -9,6 +9,7 @@
     <ClCompile Include="..\src\map.cpp" />
     <ClCompile Include="..\src\message.cpp" />
     <ClCompile Include="..\src\game.cpp" />
+    <ClCompile Include="..\src\race.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\roguelike.h" />
@@ -17,5 +18,7 @@
     <ClInclude Include="..\src\game.h" />
     <ClInclude Include="..\src\map.h" />
     <ClInclude Include="..\src\message.h" />
+    <ClInclude Include="..\src\race.h" />
+    <ClInclude Include="..\src\player.h" />
   </ItemGroup>
 </Project>

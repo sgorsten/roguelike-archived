@@ -2,7 +2,7 @@
 #define ACTOR_H
 
 #include "roguelike.h"
-#include "message.h"
+#include "race.h"
 
 class Game;
 struct Map;
@@ -42,38 +42,15 @@ struct Brain
     virtual Action Think(const Actor & actor, const Perception & perception) = 0;
 };
 
-struct Dice
-{
-    int count;
-    int sides;
-    int bonus;
-
-    int Roll(std::mt19937 & engine) const
-    {
-        int total = bonus;
-        std::uniform_int_distribution<int> distribution(1,sides);
-        for(int i=0; i<count; ++i) total += distribution(engine);
-        return total;
-    }
-};
-
-struct Attack
-{
-    Verb verb;
-    Dice dice;
-};
-
 struct Actor
 {
-    Glyph glyph;
-    Noun noun;
+    const Race * race;
     Gender gender;
-    int sightRange;
-    Attack attack;
     int hitPoints;
     int2 position;
     std::shared_ptr<Brain> brain;
-    bool isDead;
+    int delay = 0;
+    bool isDead = false;
 
     Action Think(const Game & game) const;
 };
