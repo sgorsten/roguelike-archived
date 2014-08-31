@@ -4,9 +4,13 @@
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\platform.cpp" />
     <ClCompile Include="..\src\common.cpp" />
+    <ClCompile Include="..\src\actor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\roguelike.h" />
     <ClInclude Include="..\src\common.h" />
+    <ClInclude Include="..\src\actor.h" />
+    <ClInclude Include="..\src\game.h" />
+    <ClInclude Include="..\src\map.h" />
   </ItemGroup>
 </Project>

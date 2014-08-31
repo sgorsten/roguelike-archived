@@ -48,6 +48,8 @@ struct Rect
 
 inline int2 max(const int2 & a, const int2 & b) { return {std::max(a.x,b.x), std::max(a.y,b.y)}; }
 inline int2 min(const int2 & a, const int2 & b) { return {std::min(a.x,b.x), std::min(a.y,b.y)}; }
+inline int mag2(const int2 & a) { return a.x*a.x + a.y*a.y; }
+inline int dist2(const int2 & a, const int2 & b) { return mag2(b - a); }
 
 void SetTitle(const char * title);
 void WriteOutput(const Glyph (&glyphs)[SCREEN_HEIGHT][SCREEN_WIDTH], const int2 & cursor);
