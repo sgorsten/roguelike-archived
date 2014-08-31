@@ -7,7 +7,7 @@ struct Tile
 {
     Glyph glyph;
     bool walkable;
-    std::string label;
+    const char * label;
 
     static const Tile tiles[3];
 };

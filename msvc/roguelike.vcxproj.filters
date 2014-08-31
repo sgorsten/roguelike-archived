@@ -7,6 +7,7 @@
     <ClCompile Include="..\src\actor.cpp" />
     <ClCompile Include="..\src\line.cpp" />
     <ClCompile Include="..\src\map.cpp" />
+    <ClCompile Include="..\src\message.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\roguelike.h" />
@@ -14,5 +15,6 @@
     <ClInclude Include="..\src\actor.h" />
     <ClInclude Include="..\src\game.h" />
     <ClInclude Include="..\src\map.h" />
+    <ClInclude Include="..\src\message.h" />
   </ItemGroup>
 </Project>

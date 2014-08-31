@@ -183,6 +183,7 @@
     <ClCompile Include="..\src\line.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\map.cpp" />
+    <ClCompile Include="..\src\message.cpp" />
     <ClCompile Include="..\src\platform.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -190,6 +191,7 @@
     <ClInclude Include="..\src\common.h" />
     <ClInclude Include="..\src\game.h" />
     <ClInclude Include="..\src\map.h" />
+    <ClInclude Include="..\src\message.h" />
     <ClInclude Include="..\src\roguelike.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

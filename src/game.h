@@ -4,12 +4,6 @@
 #include "map.h"
 #include "actor.h"
 
-class MessageBuffer
-{
-public:
-    std::string message;
-};
-
 class Game
 {
 public:
@@ -20,18 +14,22 @@ public:
 
     bool TryMove(Actor & actor, Direction direction)
     {
+        Verb bump = {"bump","bumps"};
+
         auto dest = actor.position + direction;
         auto & destTile = map.GetTile(dest);
         if(!destTile.walkable)
         {
-            messages.message = "You bump into a "+destTile.label+".";
+            messages(actor, bump)("into a")(destTile.label).Sentence();
             return false;
         }
         for(auto & other : actors)
         {
             if(other.position == dest)
             {
-                messages.message = "You bump into a "+other.name+".";
+                messages(actor, bump)("into").Object(other).Sentence();
+                messages(other, {"glare","glares"})("at").Object(actor).Sentence();
+                messages(actor, {"punch","punches"}).Object(other).Sentence();
                 return false;
             }
         }

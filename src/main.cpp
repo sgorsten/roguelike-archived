@@ -1,6 +1,30 @@
 #include "common.h"
 #include "game.h"
 
+#include <random>
+
+struct NpcBrain : public Brain
+{
+    std::mt19937 engine;
+
+    Action Think(const Actor & actor, const Perception & perception) override
+    {
+        std::uniform_int_distribution<int> distribution(0,15);
+        switch(distribution(engine))
+        {
+        case 0: return Action::MakeMove(Direction::SouthWest);
+        case 1: return Action::MakeMove(Direction::South);
+        case 2: return Action::MakeMove(Direction::SouthEast);
+        case 3: return Action::MakeMove(Direction::West);
+        case 4: return Action::MakeMove(Direction::East);
+        case 5: return Action::MakeMove(Direction::NorthWest);
+        case 6: return Action::MakeMove(Direction::North);
+        case 7: return Action::MakeMove(Direction::NorthEast);
+        default: return Action::MakeRest(); 
+        }
+    }
+};
+
 struct Screen
 {
     Glyph glyphs[SCREEN_HEIGHT][SCREEN_WIDTH];
@@ -99,12 +123,16 @@ int GameMain()
     game.map.Fill({{18,3}, {19,10}}, 2);
 
     game.actors = {
-        {{Color::Yellow, '@'}, "player", 8, {5,5}},
-        {{Color::Green, 'o'}, "orc", 5, {8,12}},
-        {{Color::Red, 'D'}, "red dragon", 10, {20,8}}
+        {{Color::Yellow, '@'}, {"a","player","players"}, Gender::Male, 8, {5,5}},
+        {{Color::Brown, 'r'}, {"a","rat","rats"}, Gender::Neuter, 5, {8,12}},
+        {{Color::Green, 'o'}, {"an","orc","orcs"}, Gender::Male, 5, {8,12}},
+        {{Color::Red, 'D'}, {"a","red dragon","red dragons"}, Gender::Female, 10, {20,8}}
     };
     Actor * player = &game.actors[0];
     player->brain = std::make_shared<PlayerBrain>(game.messages);
+    game.messages.self = player;
+
+    game.actors[1].brain = game.actors[2].brain = std::make_shared<NpcBrain>();
     
     while(true)
     {

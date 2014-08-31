@@ -2,6 +2,7 @@
 #define ACTOR_H
 
 #include "roguelike.h"
+#include "message.h"
 
 class Game;
 struct Map;
@@ -43,7 +44,8 @@ struct Brain
 struct Actor
 {
     Glyph glyph;
-    std::string name;
+    Noun noun;
+    Gender gender;
     int sightRange;
     int2 position;
     std::shared_ptr<Brain> brain;
