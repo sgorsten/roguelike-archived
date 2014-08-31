@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cstdint>
 #include <cassert>
+#include <random>
 #include <string>
 #include <vector>
 #include <memory>

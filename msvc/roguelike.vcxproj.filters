@@ -8,6 +8,7 @@
     <ClCompile Include="..\src\line.cpp" />
     <ClCompile Include="..\src\map.cpp" />
     <ClCompile Include="..\src\message.cpp" />
+    <ClCompile Include="..\src\game.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\roguelike.h" />

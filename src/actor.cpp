@@ -54,6 +54,7 @@ Action Actor::Think(const Game & game) const
     for(auto & other : game.actors)
     {
         if(&other == this) continue;
+        if(other.isDead) continue;
         if(dist2(position, other.position) > sightRange * sightRange) continue;
         if(!game.map.HasLineOfSight(position, other.position)) continue;         
         visibleActors.push_back(&other);

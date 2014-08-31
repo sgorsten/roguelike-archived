@@ -1,8 +1,6 @@
 #include "common.h"
 #include "game.h"
 
-#include <random>
-
 struct NpcBrain : public Brain
 {
     std::mt19937 engine;
@@ -136,10 +134,10 @@ int GameMain()
     game.map.Fill({{18,3}, {19,10}}, 2);
 
     game.actors = {
-        {{Color::Yellow, '@'}, {"a","player","players"}, Gender::Male, 8, {5,5}},
-        {{Color::Brown, 'r'}, {"a","rat","rats"}, Gender::Neuter, 5, {8,12}},
-        {{Color::Green, 'o'}, {"an","orc","orcs"}, Gender::Male, 5, {8,12}},
-        {{Color::Red, 'D'}, {"a","red dragon","red dragons"}, Gender::Female, 10, {20,8}}
+        {{Color::Yellow, '@'}, {"a","player","players"}, Gender::Male, 8, {{"hit","hits"},{2,6,3}}, 100, {5,5}},
+        {{Color::Brown, 'r'}, {"a","rat","rats"}, Gender::Neuter, 5, {{"bite","bites"},{1,4,0}}, 20, {8,11}},
+        {{Color::Green, 'o'}, {"an","orc","orcs"}, Gender::Male, 5, {{"swing at","swings at"},{1,6,1}}, 30, {8,12}},
+        {{Color::Red, 'D'}, {"a","red dragon","red dragons"}, Gender::Female, 10, {{"breathe fire at","breathes fire at"},{3,6,5}}, 200, {20,8}}
     };
     Actor * player = &game.actors[0];
     player->brain = std::make_shared<PlayerBrain>(game.messages);
@@ -151,6 +149,7 @@ int GameMain()
     {
         for(auto & actor : game.actors)
         {
+            if(actor.isDead) continue;
             auto action = actor.Think(game);
             action.Execute(game, actor);
             if(game.quit) return 0;
