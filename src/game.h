@@ -12,29 +12,47 @@ public:
     Map map;
     std::vector<Actor> actors;
 
-    bool TryMove(Actor & actor, Direction direction)
+    void Attack(Actor & aggressor, Direction direction)
+    {
+        for(auto & target : actors)
+        {
+            if(target.position == aggressor.position + direction)
+            {
+                Attack(aggressor, target);
+                return;
+            }
+        }
+        messages(aggressor, {"swing","swings"})("wildly at empty air.");
+    }
+
+    void Attack(Actor & aggressor, Actor & target)
+    {
+        messages(aggressor, {"swing","swings"})("at").Object(target)("and")(aggressor, {"hit","hits"}).Object(target).Sentence();
+    }
+
+    void Move(Actor & mover, Direction direction)
     {
         Verb bump = {"bump","bumps"};
 
-        auto dest = actor.position + direction;
+        auto dest = mover.position + direction;
         auto & destTile = map.GetTile(dest);
         if(!destTile.walkable)
         {
-            messages(actor, bump)("into a")(destTile.label).Sentence();
-            return false;
+            messages(mover, bump)("into a")(destTile.label).Sentence();
+            return;
         }
         for(auto & other : actors)
         {
             if(other.position == dest)
             {
-                messages(actor, bump)("into").Object(other).Sentence();
-                messages(other, {"glare","glares"})("at").Object(actor).Sentence();
-                messages(actor, {"punch","punches"}).Object(other).Sentence();
-                return false;
+                messages(mover, bump)("into").Object(other).Sentence();
+                messages(other, {"glare","glares"})("at").Object(mover).Sentence();
+                messages(mover, {"punch","punches"}).Object(other).Sentence();
+                return;
             }
         }
-        actor.position = dest;
-        return true;
+        mover.position = dest;
+        return;
     }
 };
 

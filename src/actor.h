@@ -22,6 +22,7 @@ public:
     static Action MakeQuit();
     static Action MakeRest();
     static Action MakeMove(Direction direction);
+    static Action MakeAttack(Direction direction);
 };
 
 class Perception

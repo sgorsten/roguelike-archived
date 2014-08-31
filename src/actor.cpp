@@ -22,7 +22,15 @@ Action Action::MakeMove(Direction direction)
 {
     return Action(100, [direction](Game & game, Actor & actor)
     {
-        game.TryMove(actor, direction);
+        game.Move(actor, direction);
+    });
+}
+
+Action Action::MakeAttack(Direction direction)
+{
+    return Action(100, [direction](Game & game, Actor & actor)
+    {
+        game.Attack(actor, direction);
     });
 }
 

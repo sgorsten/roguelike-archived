@@ -24,7 +24,7 @@ class MessageBuffer
 {
 public:
     const Actor * self;
-    const Actor * lastActor;
+    const Actor * lastActors[3]; // Last mentioned actor of each gender
     std::string message;
     bool start;
 

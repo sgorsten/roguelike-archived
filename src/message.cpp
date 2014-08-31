@@ -10,7 +10,7 @@ MessageBuffer::MessageBuffer() : self()
 void MessageBuffer::Clear()
 {
     message.clear();
-    lastActor = nullptr;
+    memset(lastActors, 0, sizeof(lastActors));
     start = true;
 }
 
@@ -41,7 +41,7 @@ MessageBuffer & MessageBuffer::Subject(const Actor & actor)
         return (*this)("you");
     }
 
-    if(&actor == lastActor)
+    if(&actor == lastActors[(int)actor.gender])
     {
         switch(actor.gender)
         {
@@ -51,7 +51,7 @@ MessageBuffer & MessageBuffer::Subject(const Actor & actor)
         }
     }
 
-    lastActor = &actor;    
+    lastActors[(int)actor.gender] = &actor;    
     return (*this)(actor.noun.indefArticle)(actor.noun.singular);
 }
 
@@ -62,7 +62,7 @@ MessageBuffer & MessageBuffer::Object(const Actor & actor)
         return (*this)("you");
     }
 
-    if(&actor == lastActor)
+    if(&actor == lastActors[(int)actor.gender])
     {
         switch(actor.gender)
         {
@@ -72,7 +72,7 @@ MessageBuffer & MessageBuffer::Object(const Actor & actor)
         }
     }
 
-    lastActor = &actor;    
+    lastActors[(int)actor.gender] = &actor;  
     return (*this)(actor.noun.indefArticle)(actor.noun.singular);
 }   
 

@@ -57,6 +57,19 @@ struct PlayerBrain : public Brain
         }
     }
 
+    Action MoveOrAttack(const Actor & actor, const Perception & perception, Direction direction)
+    {
+        for(auto other : perception.GetVisibleActors())
+        {
+            if(other->position == actor.position + direction)
+            {
+                // TODO: Confirm that other actor is an enemy
+                return Action::MakeAttack(direction);
+            }
+        }
+        return Action::MakeMove(direction);
+    }
+
     Action Think(const Actor & actor, const Perception & perception) override
     {
         Remember(perception);
@@ -70,7 +83,7 @@ struct PlayerBrain : public Brain
             screen.PutGlyph(cursor, {Color::White,ch});
             ++cursor.x;
         }
-        messages.message.clear();
+        messages.Clear();
 
         // Show map
         int2 mapOffset = {MAP_OFFSET_X, MAP_OFFSET_Y};
@@ -99,15 +112,15 @@ struct PlayerBrain : public Brain
             switch(ReadInput())
             {
             case 'Q': return Action::MakeQuit();
-            case '1': return Action::MakeMove(Direction::SouthWest); break;
-            case '2': return Action::MakeMove(Direction::South); break;
-            case '3': return Action::MakeMove(Direction::SouthEast); break;
-            case '4': return Action::MakeMove(Direction::West); break;
+            case '1': return MoveOrAttack(actor, perception, Direction::SouthWest);
+            case '2': return MoveOrAttack(actor, perception, Direction::South);
+            case '3': return MoveOrAttack(actor, perception, Direction::SouthEast);
+            case '4': return MoveOrAttack(actor, perception, Direction::West);
             case '5': return Action::MakeRest(); break;
-            case '6': return Action::MakeMove(Direction::East); break;
-            case '7': return Action::MakeMove(Direction::NorthWest); break;
-            case '8': return Action::MakeMove(Direction::North); break;
-            case '9': return Action::MakeMove(Direction::NorthEast); break;
+            case '6': return MoveOrAttack(actor, perception, Direction::East); 
+            case '7': return MoveOrAttack(actor, perception, Direction::NorthWest);
+            case '8': return MoveOrAttack(actor, perception, Direction::North);
+            case '9': return MoveOrAttack(actor, perception, Direction::NorthEast);
             }
         }
     }
