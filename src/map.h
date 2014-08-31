@@ -8,12 +8,8 @@ struct Tile
     Glyph glyph;
     bool walkable;
     std::string label;
-};
 
-const Tile g_tiles[] = {
-    {{Color::Black, ' '}, false, "void"},
-    {{Color::Gray, '.'}, true, "dirt floor"},
-    {{Color::DkGray, '#'}, false, "wall"}
+    static const Tile tiles[3];
 };
 
 struct Map
@@ -23,7 +19,7 @@ struct Map
                     Map()                                   { memset(tiles, 0, sizeof(tiles)); }
 
     const int &     operator[](const int2 & coord) const    { return tiles[coord.y][coord.x]; }
-    const Tile &    GetTile(const int2 & coord) const       { return coord.x < 0 || coord.y < 0 || coord.x >= MAP_WIDTH || coord.y >= MAP_HEIGHT ? g_tiles[0] : g_tiles[(*this)[coord]]; }
+    const Tile &    GetTile(const int2 & coord) const       { return coord.x < 0 || coord.y < 0 || coord.x >= MAP_WIDTH || coord.y >= MAP_HEIGHT ? Tile::tiles[0] : Tile::tiles[(*this)[coord]]; }
     bool            HasLineOfSight(const int2 & viewer, const int2 & target) const;
 
     int &           operator[](const int2 & coord)          { return tiles[coord.y][coord.x]; }

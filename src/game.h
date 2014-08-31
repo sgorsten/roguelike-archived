@@ -21,7 +21,7 @@ public:
     bool TryMove(Actor & actor, Direction direction)
     {
         auto dest = actor.position + direction;
-        auto & destTile = g_tiles[map[dest]];
+        auto & destTile = map.GetTile(dest);
         if(!destTile.walkable)
         {
             messages.message = "You bump into a "+destTile.label+".";

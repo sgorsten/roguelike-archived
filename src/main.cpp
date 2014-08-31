@@ -7,30 +7,43 @@ struct Screen
 
     Screen() { Clear(); }
     void Clear() { memset(glyphs, 0, sizeof(glyphs)); }
-    void PutChar(const int2 & coord, int character, Color attribute)
+    void PutGlyph(const int2 & coord, Glyph glyph)
     {
         if(coord.x < 0 || coord.y < 0 || coord.x >= SCREEN_WIDTH || coord.y >= SCREEN_HEIGHT) return;
-        glyphs[coord.y][coord.x] = {attribute, character};
+        glyphs[coord.y][coord.x] = glyph;
     }
 };
-
-
 
 struct PlayerBrain : public Brain
 {
     MessageBuffer & messages;
+    int knownTiles[MAP_HEIGHT][MAP_WIDTH];
 
-    PlayerBrain(MessageBuffer & messages) : messages(messages) {}
+    PlayerBrain(MessageBuffer & messages) : messages(messages) { memset(knownTiles, 0, sizeof(knownTiles)); }
+
+    void Remember(const Perception & perception)
+    {
+        for(int2 c={0,0}; c.y<MAP_HEIGHT; ++c.y)
+        {
+            for(c.x=0; c.x<MAP_WIDTH; ++c.x)
+            {
+                int tile = &perception.GetVisibleTile(c) - Tile::tiles;
+                if(tile) knownTiles[c.y][c.x] = tile;
+            }
+        }
+    }
 
     Action Think(const Actor & actor, const Perception & perception) override
     {
+        Remember(perception);
+
         Screen screen;
 
         // Show message
         int2 cursor={0,0};
         for(auto ch : messages.message)
         {
-            screen.PutChar(cursor, ch, Color::White);
+            screen.PutGlyph(cursor, {Color::White,ch});
             ++cursor.x;
         }
         messages.message.clear();
@@ -41,19 +54,19 @@ struct PlayerBrain : public Brain
         {
             for(c.x=0; c.x<MAP_WIDTH; ++c.x)
             {
-                const auto & tile = perception.GetVisibleTile(c);
-                screen.PutChar(c+mapOffset, tile.glyph.character, tile.glyph.color);
+                const auto & tile = Tile::tiles[knownTiles[c.y][c.x]];
+                screen.PutGlyph(c + mapOffset, tile.glyph);
             }
         }
 
         // Show actors
         for(auto other : perception.GetVisibleActors())
         {
-            screen.PutChar(other->position + mapOffset, other->glyph.character, other->glyph.color);
+            screen.PutGlyph(other->position + mapOffset, other->glyph);
         }
 
         // Show self        
-        screen.PutChar(actor.position + mapOffset, actor.glyph.character, actor.glyph.color);
+        screen.PutGlyph(actor.position + mapOffset, actor.glyph);
         WriteOutput(screen.glyphs, actor.position + mapOffset);
 
         // Make decision
