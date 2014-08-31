@@ -55,6 +55,8 @@ void SetTitle(const char * title);
 void WriteOutput(const Glyph (&glyphs)[SCREEN_HEIGHT][SCREEN_WIDTH], const int2 & cursor);
 int ReadInput();
 
+std::vector<int2> EvaluateBresenhamLine(int2 a, bool includeA, int2 b, bool includeB);
+
 extern int GameMain();
 
 #endif

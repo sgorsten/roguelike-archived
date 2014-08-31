@@ -180,7 +180,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\src\line.cpp" />
     <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\map.cpp" />
     <ClCompile Include="..\src\platform.cpp" />
   </ItemGroup>
   <ItemGroup>

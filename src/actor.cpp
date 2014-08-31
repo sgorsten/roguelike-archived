@@ -29,7 +29,7 @@ Action Action::MakeMove(Direction direction)
 const Tile & Perception::GetVisibleTile(const int2 & coord) const
 { 
     if(dist2(self.position, coord) > self.sightRange * self.sightRange) return g_tiles[0]; // Can't see past sight range
-    // TODO: Line-of-sight check
+    if(!map.HasLineOfSight(self.position, coord)) return g_tiles[0]; // Tile is occluded
     return map.GetTile(coord);
 }
 
@@ -46,7 +46,8 @@ Action Actor::Think(const Game & game) const
     for(auto & other : game.actors)
     {
         if(&other == this) continue;
-        if(dist2(position, other.position) > sightRange * sightRange) continue;                
+        if(dist2(position, other.position) > sightRange * sightRange) continue;
+        if(!game.map.HasLineOfSight(position, other.position)) continue;         
         visibleActors.push_back(&other);
     }
     return brain->Think(*this, Perception(*this, game.map, visibleActors));   

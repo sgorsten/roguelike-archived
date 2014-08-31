@@ -14,13 +14,13 @@ struct Screen
     }
 };
 
+
+
 struct PlayerBrain : public Brain
 {
     MessageBuffer & messages;
 
-    Game & game;
-
-    PlayerBrain(MessageBuffer & messages, Game & game) : messages(messages), game(game) {}
+    PlayerBrain(MessageBuffer & messages) : messages(messages) {}
 
     Action Think(const Actor & actor, const Perception & perception) override
     {
@@ -83,6 +83,7 @@ int GameMain()
     Game game;
     game.map.Fill({{0,0}, {MAP_WIDTH,MAP_HEIGHT}}, 2);
     game.map.Fill({{3,3}, {MAP_WIDTH-3,MAP_HEIGHT-3}}, 1);
+    game.map.Fill({{18,3}, {19,10}}, 2);
 
     game.actors = {
         {{Color::Yellow, '@'}, "player", 8, {5,5}},
@@ -90,7 +91,7 @@ int GameMain()
         {{Color::Red, 'D'}, "red dragon", 10, {20,8}}
     };
     Actor * player = &game.actors[0];
-    player->brain = std::make_shared<PlayerBrain>(game.messages, game);
+    player->brain = std::make_shared<PlayerBrain>(game.messages);
     
     while(true)
     {

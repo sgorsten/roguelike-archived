@@ -5,6 +5,8 @@
     <ClCompile Include="..\src\platform.cpp" />
     <ClCompile Include="..\src\common.cpp" />
     <ClCompile Include="..\src\actor.cpp" />
+    <ClCompile Include="..\src\line.cpp" />
+    <ClCompile Include="..\src\map.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\roguelike.h" />
