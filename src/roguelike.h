@@ -1,8 +1,7 @@
 #ifndef ROGUELIKE_H
 #define ROGUELIKE_H
 
-#include <cstdint>
-#include <algorithm>
+#include "common.h"
 
 const int SCREEN_WIDTH = 80;
 const int SCREEN_HEIGHT = 25;

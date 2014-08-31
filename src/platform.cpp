@@ -1,3 +1,4 @@
+#include "common.h"
 #include "roguelike.h"
 
 #include <SDL.h>

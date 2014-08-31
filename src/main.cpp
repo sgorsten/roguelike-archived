@@ -1,3 +1,4 @@
+#include "common.h"
 #include "roguelike.h"
 
 struct Screen
@@ -17,12 +18,45 @@ struct Tile
 {
     Glyph glyph;
     bool walkable;
+    std::string label;
 };
 
 const Tile g_tiles[] = {
-    {{Color::Black, ' '}, false},
-    {{Color::Gray, '.'}, true},
-    {{Color::DkGray, '#'}, false}
+    {{Color::Black, ' '}, false, "void"},
+    {{Color::Gray, '.'}, true, "dirt floor"},
+    {{Color::DkGray, '#'}, false, "wall"}
+};
+
+struct Map;
+struct Actor;
+
+class Game;
+
+struct Action
+{
+    virtual ~Action() {}
+    virtual void Execute(Game & game, Actor & actor) = 0;
+};
+
+std::unique_ptr<Action> MakeRestAction();
+
+struct Brain
+{
+    virtual std::unique_ptr<Action> Think(const Actor & actor, const Map & map, const std::vector<Actor> & others) = 0;
+};
+
+struct Actor
+{
+    Glyph glyph;
+    std::string name;
+    int2 position;
+    std::shared_ptr<Brain> brain;
+
+    std::unique_ptr<Action> Think(const Map & map, const std::vector<Actor> & others) const
+    {
+        if(brain) return brain->Think(*this, map, others);
+        else return MakeRestAction();
+    }
 };
 
 struct Map
@@ -38,27 +72,88 @@ struct Map
     void            Fill(const Rect & r, int tile)          { for(auto c=r.a; c.y<r.b.y; ++c.y) for(c.x=r.a.x; c.x<r.b.x; ++c.x) (*this)[c] = tile; }
 };
 
-bool TryMove(const Map & map, int2 & position, Direction direction)
+class MessageBuffer
 {
-    auto dest = position + direction;
-    if(!g_tiles[map[dest]].walkable) return false;
-    position = dest;
-    return true;
-}
+public:
+    std::string message;
+};
 
-int GameMain()
+class Game
 {
-    SetTitle("Roguelike Experiments");
-
+public:
+    bool quit = false;
+    MessageBuffer messages;
     Map map;
-    map.Fill({{0,0}, {MAP_WIDTH,MAP_HEIGHT}}, 2);
-    map.Fill({{3,3}, {MAP_WIDTH-3,MAP_HEIGHT-3}}, 1);
+    std::vector<Actor> actors;
 
-    const Direction directions[] = {Direction::SouthWest, Direction::South, Direction::SouthEast, Direction::West, Direction::None, Direction::East, Direction::NorthWest, Direction::North, Direction::NorthEast};
-    int2 playerPos = {5,5};
-    while(true)
+    bool TryMove(Actor & actor, Direction direction)
+    {
+        auto dest = actor.position + direction;
+        auto & destTile = g_tiles[map[dest]];
+        if(!destTile.walkable)
+        {
+            messages.message = "You bump into a "+destTile.label+".";
+            return false;
+        }
+        for(auto & other : actors)
+        {
+            if(other.position == dest)
+            {
+                messages.message = "You bump into a "+other.name+".";
+                return false;
+            }
+        }
+        actor.position = dest;
+        return true;
+    }
+};
+
+struct QuitAction : public Action
+{
+    void Execute(Game & game, Actor & actor) override
+    {
+        game.quit = true;
+    }    
+};
+
+struct RestAction : public Action
+{
+    void Execute(Game & game, Actor & actor) override {}    
+};
+std::unique_ptr<Action> MakeRestAction() { return std::make_unique<RestAction>(); }
+
+struct MoveAction : public Action
+{
+    Direction direction;
+    MoveAction(Direction direction) : direction(direction) {}
+    void Execute(Game & game, Actor & actor) override
+    {
+        game.TryMove(actor, direction);
+    }
+};
+
+struct PlayerBrain : public Brain
+{
+    MessageBuffer & messages;
+
+    Game & game;
+
+    PlayerBrain(MessageBuffer & messages, Game & game) : messages(messages), game(game) {}
+
+    std::unique_ptr<Action> Think(const Actor & actor, const Map & map, const std::vector<Actor> & others) override
     {
         Screen screen;
+
+        // Show message
+        int2 cursor={0,0};
+        for(auto ch : messages.message)
+        {
+            screen.PutChar(cursor, ch, Color::White);
+            ++cursor.x;
+        }
+        messages.message.clear();
+
+        // Show map
         int2 mapOffset = {MAP_OFFSET_X, MAP_OFFSET_Y};
         for(int2 c={0,0}; c.y<MAP_HEIGHT; ++c.y)
         {
@@ -68,24 +163,62 @@ int GameMain()
                 screen.PutChar(c+mapOffset, tile.glyph.character, tile.glyph.color);
             }
         }
-        for(int i=1; i<16; ++i)
-        {
-            screen.PutChar(int2{2+i, 3}+mapOffset, '%', (Color)i);
-        }
-        screen.PutChar(playerPos+mapOffset, '@', Color::Yellow);
-        WriteOutput(screen.glyphs, playerPos+mapOffset);
 
-        switch(int ch = ReadInput())
+        // Show actors
+        for(auto & actor : others)
         {
-        case 'Q': 
-            return 0;
-        case '1': case '2': case '3':
-        case '4': case '5': case '6':
-        case '7': case '8': case '9':
-            TryMove(map, playerPos, directions[ch-'1']);
-            break;
+            screen.PutChar(actor.position+mapOffset, actor.glyph.character, actor.glyph.color);
         }
-        playerPos = max(playerPos, {0,0});
-        playerPos = min(playerPos, {SCREEN_WIDTH-1,SCREEN_HEIGHT-1});
+        WriteOutput(screen.glyphs, actor.position+mapOffset);
+
+        // Make decision
+        while(true)
+        {
+            const Direction directions[] = {
+                Direction::SouthWest, Direction::South, Direction::SouthEast, 
+                Direction::West, Direction::None, Direction::East, 
+                Direction::NorthWest, Direction::North, Direction::NorthEast
+            };
+            switch(int ch = ReadInput())
+            {
+            case 'Q': 
+                throw std::runtime_error("Quitting time!"); // TODO: Obviously not this
+            case '1': return std::make_unique<MoveAction>(Direction::SouthWest); break;
+            case '2': return std::make_unique<MoveAction>(Direction::South); break;
+            case '3': return std::make_unique<MoveAction>(Direction::SouthEast); break;
+            case '4': return std::make_unique<MoveAction>(Direction::West); break;
+            case '5': break; // Rest
+            case '6': return std::make_unique<MoveAction>(Direction::East); break;
+            case '7': return std::make_unique<MoveAction>(Direction::NorthWest); break;
+            case '8': return std::make_unique<MoveAction>(Direction::North); break;
+            case '9': return std::make_unique<MoveAction>(Direction::NorthEast); break;
+            }
+        }
+    }
+};
+
+int GameMain()
+{
+    SetTitle("Roguelike Experiments");
+
+    Game game;
+    game.map.Fill({{0,0}, {MAP_WIDTH,MAP_HEIGHT}}, 2);
+    game.map.Fill({{3,3}, {MAP_WIDTH-3,MAP_HEIGHT-3}}, 1);
+
+    game.actors = {
+        {{Color::Yellow, '@'}, "player", {5,5}},
+        {{Color::Green, 'o'}, "orc", {8,12}},
+        {{Color::Red, 'D'}, "red dragon", {20,8}}
+    };
+    Actor * player = &game.actors[0];
+    player->brain = std::make_shared<PlayerBrain>(game.messages, game);
+    
+    while(true)
+    {
+        for(auto & actor : game.actors)
+        {
+            auto action = actor.Think(game.map, game.actors);
+            action->Execute(game, actor);
+        }
     }
 }
