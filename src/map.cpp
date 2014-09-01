@@ -4,7 +4,7 @@
 const Tile::Type Tile::types[] = {
     {{Color::Black, ' '}, false, "void"},
     {{Color::Gray, '.'}, true, "dirt floor"},
-    {{Color::DkGray, '#'}, false, "wall"}
+    {{Color::Blue, 0xb2}, false, "wall"}
 };
 
 static bool CheckLineOfSight(const Map & map, const int2 & viewer, const int2 & target, bool includeTarget)

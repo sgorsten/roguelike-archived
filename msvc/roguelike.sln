@@ -9,6 +9,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "roguelib", "roguelib.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test-console", "test-console.vcxproj", "{1B594CD3-FF62-48FF-896B-622AAD0CC31A}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test-map", "test-map.vcxproj", "{DAB309CE-E909-4638-8563-ADF5D7D9127A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{5E8C51E1-09AB-401A-8028-A7AB61E09195}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -41,8 +45,20 @@ Global
 		{1B594CD3-FF62-48FF-896B-622AAD0CC31A}.Release|Win32.Build.0 = Release|Win32
 		{1B594CD3-FF62-48FF-896B-622AAD0CC31A}.Release|x64.ActiveCfg = Release|x64
 		{1B594CD3-FF62-48FF-896B-622AAD0CC31A}.Release|x64.Build.0 = Release|x64
+		{DAB309CE-E909-4638-8563-ADF5D7D9127A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DAB309CE-E909-4638-8563-ADF5D7D9127A}.Debug|Win32.Build.0 = Debug|Win32
+		{DAB309CE-E909-4638-8563-ADF5D7D9127A}.Debug|x64.ActiveCfg = Debug|x64
+		{DAB309CE-E909-4638-8563-ADF5D7D9127A}.Debug|x64.Build.0 = Debug|x64
+		{DAB309CE-E909-4638-8563-ADF5D7D9127A}.Release|Win32.ActiveCfg = Release|Win32
+		{DAB309CE-E909-4638-8563-ADF5D7D9127A}.Release|Win32.Build.0 = Release|Win32
+		{DAB309CE-E909-4638-8563-ADF5D7D9127A}.Release|x64.ActiveCfg = Release|x64
+		{DAB309CE-E909-4638-8563-ADF5D7D9127A}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1B594CD3-FF62-48FF-896B-622AAD0CC31A} = {5E8C51E1-09AB-401A-8028-A7AB61E09195}
+		{DAB309CE-E909-4638-8563-ADF5D7D9127A} = {5E8C51E1-09AB-401A-8028-A7AB61E09195}
 	EndGlobalSection
 EndGlobal
