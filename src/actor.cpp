@@ -36,7 +36,7 @@ Action Action::MakeAttack(Direction direction)
 
 Tile Perception::GetVisibleTile(const int2 & coord) const
 { 
-    if(dist2(self.position, coord) > self.race->sightRange * self.race->sightRange) return Tile(); // Can't see past sight range
+    if(self.position.Dist2(coord) > self.race->sightRange * self.race->sightRange) return Tile(); // Can't see past sight range
     if(!map.HasLineOfSight(self.position, coord)) return Tile(); // Tile is occluded
     return map.GetTile(coord);
 }
@@ -55,7 +55,7 @@ Action Actor::Think(const Game & game) const
     {
         if(&other == this) continue;
         if(other.isDead) continue;
-        if(dist2(position, other.position) > race->sightRange * race->sightRange) continue;
+        if(position.Dist2(other.position) > race->sightRange * race->sightRange) continue;
         if(!game.map.HasLineOfSight(position, other.position)) continue;         
         visibleActors.push_back(&other);
     }
