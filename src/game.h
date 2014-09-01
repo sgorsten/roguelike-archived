@@ -14,6 +14,7 @@ public:
     std::mt19937 engine;
     std::shared_ptr<Brain> playerBrain;
 
+    int2 SelectRandomLocation();
     void SpawnPlayer(const Race & race, const int2 & position);
     void Spawn(const Race & race, const int2 & position, std::shared_ptr<Brain> brain);
 

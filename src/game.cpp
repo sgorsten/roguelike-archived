@@ -2,6 +2,17 @@
 #include "game.h"
 #include "player.h"
 
+int2 Game::SelectRandomLocation()
+{
+    std::uniform_int_distribution<int> x(0, MAP_WIDTH-1);
+    std::uniform_int_distribution<int> y(0, MAP_HEIGHT-1);
+    while(true)
+    {
+        int2 location = {x(engine), y(engine)};
+        if(map.GetTile(location).IsWalkable()) return location;
+    }
+}
+
 void Game::SpawnPlayer(const Race & race, const int2 & position)
 {
     playerBrain = std::make_shared<PlayerBrain>(messages);
@@ -83,6 +94,23 @@ void Game::Move(Actor & mover, Direction direction)
 
     auto dest = mover.position + direction;
     auto destTile = map.GetTile(dest);
+
+    // Discover secret door
+    if(destTile == 3)
+    {
+        messages(mover, {"discover","discovers"})("a")(destTile.GetLabel()).Sentence();
+        map[dest] = 1;
+        return;
+    }
+    
+    // Open closed door
+    if(destTile == 4)
+    {
+        messages(mover, {"open","opens"})("the")(destTile.GetLabel()).Sentence();
+        map[dest] = 5;
+        return;
+    }
+
     if(!destTile.IsWalkable())
     {
         messages(mover, bump)("into a")(destTile.GetLabel()).Sentence();

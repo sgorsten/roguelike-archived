@@ -40,7 +40,9 @@ struct Map
     bool            HasLineOfSight(const int2 & viewer, const int2 & target) const;
 
     Tile &          operator[](const int2 & coord)          { return tiles[coord.y][coord.x]; }
-    void            Fill(const Rect & r, Tile tile)          { for(auto c=r.a; c.y<r.b.y; ++c.y) for(c.x=r.a.x; c.x<r.b.x; ++c.x) (*this)[c] = tile; }
+    void            Fill(const Rect & r, Tile tile)         { for(auto c=r.a; c.y<r.b.y; ++c.y) for(c.x=r.a.x; c.x<r.b.x; ++c.x) (*this)[c] = tile; }
 };
+
+Map GenerateRandomMap(std::mt19937 & engine);
 
 #endif
