@@ -2,31 +2,9 @@
 #define PLAYER_H
 
 #include "game.h"
+#include "screen.h"
 
 #include <sstream>
-
-struct Screen
-{
-    Glyph glyphs[SCREEN_HEIGHT][SCREEN_WIDTH];
-
-    Screen() { Clear(); }
-    void Clear() { Clear({{0,0},{SCREEN_WIDTH,SCREEN_HEIGHT}}); }
-    void Clear(const Rect & rect)
-    {
-        for(int2 c=rect.a; c.y<rect.b.y; ++c.y)
-        {
-            for(c.x=rect.a.x; c.x<rect.b.x; ++c.x)
-            {
-                PutGlyph(c, {});
-            }
-        }
-    }
-    void PutGlyph(const int2 & coord, Glyph glyph)
-    {
-        if(coord.x < 0 || coord.y < 0 || coord.x >= SCREEN_WIDTH || coord.y >= SCREEN_HEIGHT) return;
-        glyphs[coord.y][coord.x] = glyph;
-    }
-};
 
 struct PlayerBrain : public Brain
 {
@@ -69,12 +47,8 @@ struct PlayerBrain : public Brain
         screen.Clear({{0,0},{MAP_WIDTH,3}});
         std::ostringstream ss;
         ss << prompt << " (12346789, or Z to cancel)?";
-        auto s = ss.str();
-        for(int i=0; i<s.size(); ++i)
-            screen.PutGlyph({i,0}, {Color::White,s[i]});
-
-        int2 mapOffset = {MAP_OFFSET_X, MAP_OFFSET_Y};
-        WriteOutput(screen.glyphs, actor.position + mapOffset);
+        screen.PutString({0,0}, Color::White, ss.str());
+        WriteOutput(screen.glyphs, actor.position + int2{MAP_OFFSET_X, MAP_OFFSET_Y});
 
         while(true)
         {

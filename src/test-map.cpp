@@ -1,4 +1,5 @@
 #include "map.h"
+#include "screen.h"
 #include <sstream>
 
 Map CreateMap(int seed)
@@ -13,25 +14,24 @@ int GameMain()
     int seed = 1;
     Map map = CreateMap(seed);
 
+    Screen screen;
+
     while(true)
     {
+        screen.Clear();
+
         std::ostringstream ss;
         ss << "Seed = " << seed;
-        auto s = ss.str();
+        screen.PutString({0,0}, Color::White, ss.str());
 
-        Glyph screen[SCREEN_HEIGHT][SCREEN_WIDTH] = {};
-        for(int i=0; i<s.size(); ++i)
-        {
-            screen[0][i] = {Color::White, s[i]};
-        }
         for(int y=0; y<MAP_HEIGHT; ++y)
         {
             for(int x=0; x<MAP_WIDTH; ++x)
             {
-                screen[y+MAP_OFFSET_Y][x+MAP_OFFSET_X] = map.GetTile({x,y}).GetGlyph();
+                screen.PutGlyph({x+MAP_OFFSET_X,y+MAP_OFFSET_Y}, map.GetTile({x,y}).GetGlyph());
             }
         }
-        WriteOutput(screen, {7,0});
+        WriteOutput(screen.glyphs, {7,0});
 
         switch(ReadInput())
         {

@@ -19,5 +19,6 @@
     <ClInclude Include="..\src\message.h" />
     <ClInclude Include="..\src\player.h" />
     <ClInclude Include="..\src\race.h" />
+    <ClInclude Include="..\src\screen.h" />
   </ItemGroup>
 </Project>

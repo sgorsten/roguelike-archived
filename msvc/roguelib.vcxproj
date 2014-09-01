@@ -42,6 +42,7 @@
     <ClInclude Include="..\src\player.h" />
     <ClInclude Include="..\src\race.h" />
     <ClInclude Include="..\src\roguelike.h" />
+    <ClInclude Include="..\src\screen.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{BEA6D965-7875-4EC7-AFE0-6BF269D87BCF}</ProjectGuid>
