@@ -18,10 +18,10 @@ public:
     void SpawnPlayer(const Race & race, const int2 & position);
     void Spawn(const Race & race, const int2 & position, std::shared_ptr<Brain> brain);
 
+    Actor * GetActor(const int2 & position);   
+
     void Tick();
     void Move(Actor & mover, Direction direction);
-    void Attack(Actor & aggressor, Direction direction);
-    void Attack(Actor & aggressor, Actor & target);
 };
 
 #endif

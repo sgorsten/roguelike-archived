@@ -9,15 +9,15 @@ struct NpcBrain : public Brain
         std::uniform_int_distribution<int> distribution(0,15);
         switch(distribution(engine))
         {
-        case 0: return Action::MakeMove(Direction::SouthWest);
-        case 1: return Action::MakeMove(Direction::South);
-        case 2: return Action::MakeMove(Direction::SouthEast);
-        case 3: return Action::MakeMove(Direction::West);
-        case 4: return Action::MakeMove(Direction::East);
-        case 5: return Action::MakeMove(Direction::NorthWest);
-        case 6: return Action::MakeMove(Direction::North);
-        case 7: return Action::MakeMove(Direction::NorthEast);
-        default: return Action::MakeRest(); 
+        case 0: return Action::Move(Direction::SouthWest);
+        case 1: return Action::Move(Direction::South);
+        case 2: return Action::Move(Direction::SouthEast);
+        case 3: return Action::Move(Direction::West);
+        case 4: return Action::Move(Direction::East);
+        case 5: return Action::Move(Direction::NorthWest);
+        case 6: return Action::Move(Direction::North);
+        case 7: return Action::Move(Direction::NorthEast);
+        default: return Action::Rest(); 
         }
     }
 };
@@ -29,7 +29,7 @@ int GameMain()
     SetTitle("Roguelike Experiments");
 
     Game game;
-    game.engine = std::mt19937(std::chrono::system_clock::now().time_since_epoch().count());
+    game.engine = std::mt19937(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
     game.map = GenerateRandomMap(game.engine);
 
     game.SpawnPlayer(Race::races[0], game.SelectRandomLocation());

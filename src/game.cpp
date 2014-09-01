@@ -2,6 +2,18 @@
 #include "game.h"
 #include "player.h"
 
+Actor * Game::GetActor(const int2 & position)
+{
+    for(auto & actor : actors)
+    {
+        if(actor.position == position)
+        {
+            return &actor;
+        }
+    }
+    return nullptr;
+}
+
 int2 Game::SelectRandomLocation()
 {
     std::uniform_int_distribution<int> x(0, MAP_WIDTH-1);
@@ -60,73 +72,4 @@ void Game::Tick()
         }
         else ++it;
     }
-}
-
-void Game::Attack(Actor & aggressor, Direction direction)
-{
-    for(auto & target : actors)
-    {
-        if(target.isDead) continue;
-        if(target.position == aggressor.position + direction)
-        {
-            Attack(aggressor, target);
-            return;
-        }
-    }
-    messages(aggressor, {"swing","swings"})("wildly at empty air.");
-}
-
-void Game::Attack(Actor & aggressor, Actor & target)
-{
-    messages(aggressor, aggressor.race->unarmedAttack.verb).Object(target).Sentence();
-    int damage = aggressor.race->unarmedAttack.dice.Roll(engine);
-    target.hitPoints -= damage;
-    if(target.hitPoints < 1)
-    {
-        target.isDead = true;
-        messages(target, {"die","dies"}).Sentence();
-    }
-}
-
-void Game::Move(Actor & mover, Direction direction)
-{
-    Verb bump = {"bump","bumps"};
-
-    auto dest = mover.position + direction;
-    auto destTile = map.GetTile(dest);
-
-    // Discover secret door
-    if(destTile == 3)
-    {
-        messages(mover, {"discover","discovers"})("a")(destTile.GetLabel()).Sentence();
-        map[dest] = 1;
-        return;
-    }
-    
-    // Open closed door
-    if(destTile == 4)
-    {
-        messages(mover, {"open","opens"})("the")(destTile.GetLabel()).Sentence();
-        map[dest] = 5;
-        return;
-    }
-
-    if(!destTile.IsWalkable())
-    {
-        messages(mover, bump)("into a")(destTile.GetLabel()).Sentence();
-        return;
-    }
-    for(auto & other : actors)
-    {
-        if(other.isDead) continue;
-        if(other.position == dest)
-        {
-            messages(mover, bump)("into").Object(other).Sentence();
-            messages(other, {"glare","glares"})("at").Object(mover).Sentence();
-            messages(mover, {"punch","punches"}).Object(other).Sentence();
-            return;
-        }
-    }
-    mover.position = dest;
-    return;
 }

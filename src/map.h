@@ -3,6 +3,17 @@
 
 #include "roguelike.h"
 
+enum
+{
+    TILE_VOID,
+    TILE_FLOOR,
+    TILE_WALL,
+    TILE_HIDDEN_DOOR,
+    TILE_CLOSED_DOOR,
+    TILE_OPEN_DOOR,
+    NUM_TILES
+};
+
 class Tile
 {
     struct Type
@@ -11,7 +22,7 @@ class Tile
         bool walkable;
         const char * label;
     };
-    static const Type types[6];
+    static const Type types[NUM_TILES];
 
     int             type;
 public:

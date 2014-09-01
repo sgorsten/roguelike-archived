@@ -1,7 +1,7 @@
 #include "common.h"
 #include "map.h"
 
-const Tile::Type Tile::types[] = {
+const Tile::Type Tile::types[NUM_TILES] = {
     {{Color::Black, ' '}, false, "void"},
     {{Color::Gray, '.'}, true, "dirt floor"},
     {{Color::Blue, 0xb2}, false, "wall"},
@@ -91,30 +91,30 @@ static void CarveTunnel(Map & map, std::mt19937 & engine, const Rect & roomA, co
     }
     int turn = std::uniform_int_distribution<int>(0, absDelta.x)(engine);
     auto point = pointA;
-    map[point] = 1;
+    map[point] = TILE_FLOOR;
     for(int i=0; i<turn; ++i)
     {
         point += stepMain;
-        map[point] = 1;
+        map[point] = TILE_FLOOR;
         point += stepMain;
-        map[point] = 1;
+        map[point] = TILE_FLOOR;
     }
     for(int i=0; i<absDelta.y; ++i)
     {
         point += stepSide;
-        map[point] = 1;
+        map[point] = TILE_FLOOR;
         point += stepSide;
-        map[point] = 1;
+        map[point] = TILE_FLOOR;
     }
     for(int i=turn; i<absDelta.x; ++i)
     {
         point += stepMain;
-        map[point] = 1;
+        map[point] = TILE_FLOOR;
         point += stepMain;
-        map[point] = 1;
+        map[point] = TILE_FLOOR;
     }
-    map[doorA.first + doorA.second] = 1; // TODO: Door tiles
-    map[doorB.first + doorB.second] = 1; // TODO: Door tiles
+    map[doorA.first + doorA.second] = TILE_FLOOR;
+    map[doorB.first + doorB.second] = TILE_FLOOR;
 }
 
 Map GenerateRandomMap(std::mt19937 & engine)
@@ -147,10 +147,10 @@ Map GenerateRandomMap(std::mt19937 & engine)
 
     // Fill with solid wall
     Map map;
-    map.Fill({{0,0}, {MAP_WIDTH,MAP_HEIGHT}}, 2); 
+    map.Fill({{0,0}, {MAP_WIDTH,MAP_HEIGHT}}, TILE_WALL); 
 
     // Carve rooms
-    for(auto & room : rooms) map.Fill(room, 1);
+    for(auto & room : rooms) map.Fill(room, TILE_FLOOR);
 
     // Carve tunnels
     for(int i=1; i<rooms.size(); ++i)
@@ -168,9 +168,9 @@ Map GenerateRandomMap(std::mt19937 & engine)
             while(true)
             {
                 auto dir = directions[std::uniform_int_distribution<int>(0,3)(engine)];
-                if(map[point+dir] != 2)
+                if(map[point+dir] != TILE_WALL)
                 {
-                    map[point+dir] = 3;
+                    map[point+dir] = TILE_HIDDEN_DOOR;
 
                     auto lastPoint = point+dir;
                     auto curPoint = lastPoint+dir;
@@ -180,7 +180,7 @@ Map GenerateRandomMap(std::mt19937 & engine)
                         for(int i=0; i<4; ++i) if(map.GetTile(curPoint + directions[i]).IsWalkable() && curPoint + directions[i] != lastPoint) ++neighbors;
                         if(neighbors >= 2)
                         {
-                            map[lastPoint] = 3;
+                            map[lastPoint] = TILE_HIDDEN_DOOR;
                             break;
                         }
                         for(int i=0; i<4; ++i)
@@ -206,14 +206,14 @@ Map GenerateRandomMap(std::mt19937 & engine)
     {
         for(int x=room.a.x; x<room.b.x; x+=2)
         {
-            if(map.GetTile({x,room.a.y-1}).IsWalkable()) map[{x,room.a.y-1}] = 4;
-            if(map.GetTile({x,room.b.y}).IsWalkable()) map[{x,room.b.y}] = 4;
+            if(map.GetTile({x,room.a.y-1}).IsWalkable()) map[{x,room.a.y-1}] = TILE_CLOSED_DOOR;
+            if(map.GetTile({x,room.b.y}).IsWalkable()) map[{x,room.b.y}] = TILE_CLOSED_DOOR;
         }
 
         for(int y=room.a.y; y<room.b.y; y+=2)
         {
-            if(map.GetTile({room.a.x-1,y}).IsWalkable()) map[{room.a.x-1,y}] = 4;
-            if(map.GetTile({room.b.x,y}).IsWalkable()) map[{room.b.x,y}] = 4;
+            if(map.GetTile({room.a.x-1,y}).IsWalkable()) map[{room.a.x-1,y}] = TILE_CLOSED_DOOR;
+            if(map.GetTile({room.b.x,y}).IsWalkable()) map[{room.b.x,y}] = TILE_CLOSED_DOOR;
         }
     }
 

@@ -19,10 +19,12 @@ public:
     int GetCost() const { return cost; }
     void Execute(Game & game, Actor & actor) { effect(game, actor); }
 
-    static Action MakeQuit();
-    static Action MakeRest();
-    static Action MakeMove(Direction direction);
-    static Action MakeAttack(Direction direction);
+    static Action Quit();
+    static Action Rest();
+    static Action Move(Direction direction);
+    static Action Attack(Direction direction);
+    static Action Open(Direction direction);
+    static Action Close(Direction direction);
 };
 
 class Perception
