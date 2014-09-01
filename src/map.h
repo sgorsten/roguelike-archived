@@ -11,7 +11,7 @@ class Tile
         bool walkable;
         const char * label;
     };
-    static const Type types[3];
+    static const Type types[6];
 
     int             type;
 public:
