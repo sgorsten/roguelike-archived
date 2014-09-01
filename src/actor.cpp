@@ -34,10 +34,10 @@ Action Action::MakeAttack(Direction direction)
     });
 }
 
-const Tile & Perception::GetVisibleTile(const int2 & coord) const
+Tile Perception::GetVisibleTile(const int2 & coord) const
 { 
-    if(dist2(self.position, coord) > self.race->sightRange * self.race->sightRange) return Tile::tiles[0]; // Can't see past sight range
-    if(!map.HasLineOfSight(self.position, coord)) return Tile::tiles[0]; // Tile is occluded
+    if(dist2(self.position, coord) > self.race->sightRange * self.race->sightRange) return Tile(); // Can't see past sight range
+    if(!map.HasLineOfSight(self.position, coord)) return Tile(); // Tile is occluded
     return map.GetTile(coord);
 }
 

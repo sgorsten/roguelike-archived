@@ -6,7 +6,7 @@
 
 class Game;
 struct Map;
-struct Tile;
+class Tile;
 struct Actor;
 
 class Action
@@ -33,7 +33,7 @@ class Perception
 public:
     Perception(const Actor & self, const Map & map, const std::vector<const Actor *> & actors) : self(self), map(map), actors(actors) {}
 
-    const Tile & GetVisibleTile(const int2 & coord) const;
+    Tile GetVisibleTile(const int2 & coord) const;
     const std::vector<const Actor *> & GetVisibleActors() const { return actors; }
 };
 

@@ -19,7 +19,7 @@ struct Screen
 struct PlayerBrain : public Brain
 {
     MessageBuffer & messages;
-    int knownTiles[MAP_HEIGHT][MAP_WIDTH];
+    Tile knownTiles[MAP_HEIGHT][MAP_WIDTH];
 
     PlayerBrain(MessageBuffer & messages) : messages(messages) { memset(knownTiles, 0, sizeof(knownTiles)); }
 
@@ -29,8 +29,8 @@ struct PlayerBrain : public Brain
         {
             for(c.x=0; c.x<MAP_WIDTH; ++c.x)
             {
-                int tile = &perception.GetVisibleTile(c) - Tile::tiles;
-                if(tile) knownTiles[c.y][c.x] = tile;
+                auto tile = perception.GetVisibleTile(c);
+                if(!tile.IsVoid()) knownTiles[c.y][c.x] = tile;
             }
         }
     }
@@ -71,8 +71,8 @@ struct PlayerBrain : public Brain
         {
             for(c.x=0; c.x<MAP_WIDTH; ++c.x)
             {
-                const auto & tile = Tile::tiles[knownTiles[c.y][c.x]];
-                screen.PutGlyph(c + mapOffset, tile.glyph);
+                auto tile = knownTiles[c.y][c.x];
+                screen.PutGlyph(c + mapOffset, tile.GetGlyph());
             }
         }
 

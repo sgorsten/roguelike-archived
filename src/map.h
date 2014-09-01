@@ -3,27 +3,44 @@
 
 #include "roguelike.h"
 
-struct Tile
+class Tile
 {
-    Glyph glyph;
-    bool walkable;
-    const char * label;
+    struct Type
+    {
+        Glyph glyph;
+        bool walkable;
+        const char * label;
+    };
+    static const Type types[3];
 
-    static const Tile tiles[3];
+    int             type;
+public:
+                    Tile() : type() {}
+                    Tile(int type) : type(type) {}
+    
+    bool            operator == (Tile tile) const { return type == tile.type; }
+    bool            operator != (Tile tile) const { return type != tile.type; }
+
+    bool            IsVoid() const { return type == 0; }
+    Glyph           GetGlyph() const { return types[type].glyph; }
+    bool            IsWalkable() const { return types[type].walkable; }
+    const char *    GetLabel() const { return types[type].label; }
 };
+
+
 
 struct Map
 {
-    int             tiles[MAP_HEIGHT][MAP_WIDTH];
+    Tile            tiles[MAP_HEIGHT][MAP_WIDTH];
     
-                    Map()                                   { memset(tiles, 0, sizeof(tiles)); }
+                    Map()                                   {}
 
-    const int &     operator[](const int2 & coord) const    { return tiles[coord.y][coord.x]; }
-    const Tile &    GetTile(const int2 & coord) const       { return coord.x < 0 || coord.y < 0 || coord.x >= MAP_WIDTH || coord.y >= MAP_HEIGHT ? Tile::tiles[0] : Tile::tiles[(*this)[coord]]; }
+    const Tile &    operator[](const int2 & coord) const    { return tiles[coord.y][coord.x]; }
+    Tile            GetTile(const int2 & coord) const       { return coord.x < 0 || coord.y < 0 || coord.x >= MAP_WIDTH || coord.y >= MAP_HEIGHT ? Tile(0) : (*this)[coord]; }
     bool            HasLineOfSight(const int2 & viewer, const int2 & target) const;
 
-    int &           operator[](const int2 & coord)          { return tiles[coord.y][coord.x]; }
-    void            Fill(const Rect & r, int tile)          { for(auto c=r.a; c.y<r.b.y; ++c.y) for(c.x=r.a.x; c.x<r.b.x; ++c.x) (*this)[c] = tile; }
+    Tile &          operator[](const int2 & coord)          { return tiles[coord.y][coord.x]; }
+    void            Fill(const Rect & r, Tile tile)          { for(auto c=r.a; c.y<r.b.y; ++c.y) for(c.x=r.a.x; c.x<r.b.x; ++c.x) (*this)[c] = tile; }
 };
 
 #endif

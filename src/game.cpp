@@ -82,10 +82,10 @@ void Game::Move(Actor & mover, Direction direction)
     Verb bump = {"bump","bumps"};
 
     auto dest = mover.position + direction;
-    auto & destTile = map.GetTile(dest);
-    if(!destTile.walkable)
+    auto destTile = map.GetTile(dest);
+    if(!destTile.IsWalkable())
     {
-        messages(mover, bump)("into a")(destTile.label).Sentence();
+        messages(mover, bump)("into a")(destTile.GetLabel()).Sentence();
         return;
     }
     for(auto & other : actors)
