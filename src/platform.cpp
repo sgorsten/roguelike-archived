@@ -26,7 +26,7 @@ int main(int argc, char * argv[])
         // Obtain an OpenGL context
         glContext = SDL_GL_CreateContext(g_sdlWindow);
         if(!glContext) throw std::runtime_error("Unable to create OpenGL context");
-    
+
         // Load font texture
         glGenTextures(1, &fontTexture);
         glBindTexture(GL_TEXTURE_2D, fontTexture);
@@ -83,8 +83,8 @@ void WriteOutput(const Glyph (&glyphs)[SCREEN_HEIGHT][SCREEN_WIDTH], const int2 
         for(int x=0; x<SCREEN_WIDTH; ++x)
         {
             auto & glyph = glyphs[y][x];
-            int charX = glyph.character % 32;
-            int charY = glyph.character / 32;
+            int charX = (uint8_t)glyph.character % 32;
+            int charY = (uint8_t)glyph.character / 32;
             float s0 = (float)(charX+0)*8 / 256;
             float s1 = (float)(charX+1)*8 / 256;
             float t0 = (float)(charY+0)*14 / 128;

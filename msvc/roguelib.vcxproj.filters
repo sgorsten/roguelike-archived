@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\src\actor.cpp" />
+    <ClCompile Include="..\src\common.cpp" />
+    <ClCompile Include="..\src\game.cpp" />
+    <ClCompile Include="..\src\line.cpp" />
+    <ClCompile Include="..\src\map.cpp" />
+    <ClCompile Include="..\src\message.cpp" />
+    <ClCompile Include="..\src\platform.cpp" />
+    <ClCompile Include="..\src\race.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\roguelike.h" />
+    <ClInclude Include="..\src\actor.h" />
+    <ClInclude Include="..\src\common.h" />
+    <ClInclude Include="..\src\game.h" />
+    <ClInclude Include="..\src\map.h" />
+    <ClInclude Include="..\src\message.h" />
+    <ClInclude Include="..\src\player.h" />
+    <ClInclude Include="..\src\race.h" />
+  </ItemGroup>
+</Project>

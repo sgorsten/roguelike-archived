@@ -1,4 +1,3 @@
-#include "common.h"
 #include "game.h"
 
 struct NpcBrain : public Brain

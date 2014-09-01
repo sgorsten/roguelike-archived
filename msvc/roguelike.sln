@@ -5,6 +5,10 @@ VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "roguelike", "roguelike.vcxproj", "{34FF7ED0-ACA5-41B2-A0FE-9848951FF014}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "roguelib", "roguelib.vcxproj", "{BEA6D965-7875-4EC7-AFE0-6BF269D87BCF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test-console", "test-console.vcxproj", "{1B594CD3-FF62-48FF-896B-622AAD0CC31A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -21,6 +25,22 @@ Global
 		{34FF7ED0-ACA5-41B2-A0FE-9848951FF014}.Release|Win32.Build.0 = Release|Win32
 		{34FF7ED0-ACA5-41B2-A0FE-9848951FF014}.Release|x64.ActiveCfg = Release|x64
 		{34FF7ED0-ACA5-41B2-A0FE-9848951FF014}.Release|x64.Build.0 = Release|x64
+		{BEA6D965-7875-4EC7-AFE0-6BF269D87BCF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BEA6D965-7875-4EC7-AFE0-6BF269D87BCF}.Debug|Win32.Build.0 = Debug|Win32
+		{BEA6D965-7875-4EC7-AFE0-6BF269D87BCF}.Debug|x64.ActiveCfg = Debug|x64
+		{BEA6D965-7875-4EC7-AFE0-6BF269D87BCF}.Debug|x64.Build.0 = Debug|x64
+		{BEA6D965-7875-4EC7-AFE0-6BF269D87BCF}.Release|Win32.ActiveCfg = Release|Win32
+		{BEA6D965-7875-4EC7-AFE0-6BF269D87BCF}.Release|Win32.Build.0 = Release|Win32
+		{BEA6D965-7875-4EC7-AFE0-6BF269D87BCF}.Release|x64.ActiveCfg = Release|x64
+		{BEA6D965-7875-4EC7-AFE0-6BF269D87BCF}.Release|x64.Build.0 = Release|x64
+		{1B594CD3-FF62-48FF-896B-622AAD0CC31A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1B594CD3-FF62-48FF-896B-622AAD0CC31A}.Debug|Win32.Build.0 = Debug|Win32
+		{1B594CD3-FF62-48FF-896B-622AAD0CC31A}.Debug|x64.ActiveCfg = Debug|x64
+		{1B594CD3-FF62-48FF-896B-622AAD0CC31A}.Debug|x64.Build.0 = Debug|x64
+		{1B594CD3-FF62-48FF-896B-622AAD0CC31A}.Release|Win32.ActiveCfg = Release|Win32
+		{1B594CD3-FF62-48FF-896B-622AAD0CC31A}.Release|Win32.Build.0 = Release|Win32
+		{1B594CD3-FF62-48FF-896B-622AAD0CC31A}.Release|x64.ActiveCfg = Release|x64
+		{1B594CD3-FF62-48FF-896B-622AAD0CC31A}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
