@@ -28,7 +28,14 @@ int GameMain()
         {
             for(int x=0; x<MAP_WIDTH; ++x)
             {
-                screen.PutGlyph({x+MAP_OFFSET_X,y+MAP_OFFSET_Y}, map.GetTile({x,y}).GetGlyph());
+                for(int dir=0; dir<9; ++dir)
+                {
+                    if(map.GetTile(int2(x,y) + (Direction)dir).IsWalkable())
+                    {
+                        screen.PutGlyph({x+MAP_OFFSET_X,y+MAP_OFFSET_Y}, map.GetTile({x,y}).GetGlyph());
+                        break;
+                    }
+                }                
             }
         }
         WriteOutput(screen.glyphs, {7,0});
