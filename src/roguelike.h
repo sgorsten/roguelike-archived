@@ -10,7 +10,29 @@ const int MAP_HEIGHT = 22;
 const int MAP_OFFSET_X = 0;
 const int MAP_OFFSET_Y = 3;
 
-enum class Color : uint8_t { Black, Blue, Green, Cyan, Red, Magenta, Brown, Gray, DkGray, LtBlue, LtGreen, LtCyan, LtRed, LtMagenta, Yellow, White };
+struct Color
+{
+    float r,g,b;
+
+    static Color FromHSV(float hueInDegrees, float saturation, float value)
+    {
+        float phase = hueInDegrees/60;
+        float chroma = saturation * value;
+        float x = chroma * (1 - std::abs(std::fmod(phase, 2.0f) - 1));
+        switch((int)phase % 6)
+        {
+        case 0: return {chroma,x,0};
+        case 1: return {x,chroma,0};
+        case 2: return {0,chroma,x};
+        case 3: return {0,x,chroma};
+        case 4: return {x,0,chroma};
+        case 5: return {chroma,0,x};
+        }
+    }
+
+    static const Color Black, Blue, Green, Cyan, Red, Magenta, Brown, Gray, DkGray, LtBlue, LtGreen, LtCyan, LtRed, LtMagenta, Yellow, White;
+};
+
 enum class Direction : uint8_t { None, North, NorthEast, East, SouthEast, South, SouthWest, West, NorthWest };
 
 struct Glyph

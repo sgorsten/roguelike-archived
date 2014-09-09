@@ -5,6 +5,23 @@
 #include <SDL_opengl.h>
 #include <iostream>
 
+const Color Color::Black = {0.0f,0.0f,0.0f};
+const Color Color::Blue = {0.0f,0.0f,0.5f};
+const Color Color::Green = {0.0f,0.5f,0.0f};
+const Color Color::Cyan = {0.0f,0.5f,0.5f};
+const Color Color::Red = {0.5f,0.0f,0.0f};
+const Color Color::Magenta = {0.5f,0.0f,0.5f};
+const Color Color::Brown = {0.3f,0.05f,0.0f};
+const Color Color::Gray = {0.6f,0.6f,0.6f};
+const Color Color::DkGray = {0.3f,0.3f,0.3f};
+const Color Color::LtBlue = {0.0f,0.0f,1.0f};
+const Color Color::LtGreen = {0.0f,1.0f,0.0f};
+const Color Color::LtCyan = {0.0f,1.0f,1.0f};
+const Color Color::LtRed = {1.0f,0.0f,0.0f};
+const Color Color::LtMagenta = {1.0f,0.0f,1.0f};
+const Color Color::Yellow = {1.0f,1.0f,0.0f};
+const Color Color::White = {1.0f,1.0f,1.0f};
+
 namespace
 {
     extern const uint8_t g_fontImage[256*128];
@@ -20,6 +37,7 @@ int main(int argc, char * argv[])
     {
         // Open an SDL window
         if(SDL_Init(SDL_INIT_VIDEO)) throw std::runtime_error(std::string("Unable to initialize SDL: ") + SDL_GetError());
+        SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, SDL_TRUE);
         g_sdlWindow = SDL_CreateWindow("", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 700, SDL_WINDOW_OPENGL);  
         if(!g_sdlWindow) throw std::runtime_error("Unable to open SDL window");
 
@@ -69,13 +87,10 @@ void SetTitle(const char * title)
 
 void WriteOutput(const Glyph (&glyphs)[SCREEN_HEIGHT][SCREEN_WIDTH], const int2 & cursor)
 {
-    const float colors[16][3] = {
-        {0.0f,0.0f,0.0f}, {0.0f,0.0f,0.5f}, {0.0f,0.5f,0.0f}, {0.0f,0.5f,0.5f}, {0.5f,0.0f,0.0f}, {0.5f,0.0f,0.5f}, {0.6f,0.3f,0.0f}, {0.6f,0.6f,0.6f},
-        {0.3f,0.3f,0.3f}, {0.0f,0.0f,1.0f}, {0.0f,1.0f,0.0f}, {0.0f,1.0f,1.0f}, {1.0f,0.0f,0.0f}, {1.0f,0.0f,1.0f}, {1.0f,1.0f,0.0f}, {1.0f,1.0f,1.0f}
-    };
-
+    glEnable(GL_FRAMEBUFFER_SRGB_EXT);
+    glClearColor(0,0,0,1);
     glClear(GL_COLOR_BUFFER_BIT);
-
+    
     glEnable(GL_TEXTURE_2D);
     glBegin(GL_QUADS);
     for(int y=0; y<SCREEN_HEIGHT; ++y)
@@ -90,7 +105,7 @@ void WriteOutput(const Glyph (&glyphs)[SCREEN_HEIGHT][SCREEN_WIDTH], const int2 
             float t0 = (float)(charY+0)*14 / 128;
             float t1 = (float)(charY+1)*14 / 128;
 
-            glColor3fv(colors[(int)glyph.color]);
+            glColor3fv(&glyph.color.r);
             glTexCoord2f(s0,t0); glVertex2i((x+0)*8, (y+0)*14);
             glTexCoord2f(s1,t0); glVertex2i((x+1)*8, (y+0)*14);
             glTexCoord2f(s1,t1); glVertex2i((x+1)*8, (y+1)*14);

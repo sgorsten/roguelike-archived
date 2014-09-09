@@ -7,6 +7,8 @@ int GameMain()
 {
     SetTitle("Console test");
 
+    Color colors[] = {Color::Black,Color::Blue,Color::Green,Color::Cyan,Color::Red,Color::Magenta,Color::Brown,Color::Gray,Color::DkGray,Color::LtBlue,Color::LtGreen,Color::LtCyan,Color::LtRed,Color::LtMagenta,Color::Yellow,Color::White};
+
     Screen screen;
     for(int y=0; y<16; ++y)
     {
@@ -14,7 +16,7 @@ int GameMain()
         {
             screen.PutGlyph({x+2,y+2}, {Color::Gray, y*16+x});
         }
-        screen.PutGlyph({20,y+2}, {(Color)y, 'X'});
+        screen.PutGlyph({20,y+2}, {colors[y], 'X'});
     }
 
     int2 cursor;
@@ -25,7 +27,14 @@ int GameMain()
         ss << '\'' << (char)(code) << "' = 0x" << std::hex << code << "  ";
         screen.PutString({20,2}, Color::Gray, ss.str());
         for(int i=1; i<16; ++i)
-            screen.PutString({20,2+i}, (Color)i, std::string(3,(char)code));
+        {
+            float hue = (i-1)*360.0f/15;
+            for(int j=0; j<15; ++j)
+            {
+                screen.PutGlyph({20+j,2+i}, {Color::FromHSV(hue, 1.0f, (float)(j+1)/15), (char)code});
+            }
+        }
+            
         WriteOutput(screen.glyphs, cursor+int2(2,2));
 
         switch(ReadInput())
