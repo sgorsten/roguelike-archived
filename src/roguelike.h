@@ -31,6 +31,8 @@ struct Color
         }
     }
 
+    Color operator * (float s) const { return {r*s,g*s,b*s}; }
+
     static const Color Black, Blue, Green, Cyan, Red, Magenta, Brown, Gray, DkGray, LtBlue, LtGreen, LtCyan, LtRed, LtMagenta, Yellow, White;
 };
 
