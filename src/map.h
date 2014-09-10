@@ -38,8 +38,6 @@ public:
     const char *    GetLabel() const { return types[type].label; }
 };
 
-
-
 struct Map
 {
     Tile            tiles[MAP_HEIGHT][MAP_WIDTH];
@@ -52,6 +50,24 @@ struct Map
 
     Tile &          operator[](const int2 & coord)          { return tiles[coord.y][coord.x]; }
     void            Fill(const Rect & r, Tile tile)         { for(auto c=r.a; c.y<r.b.y; ++c.y) for(c.x=r.a.x; c.x<r.b.x; ++c.x) (*this)[c] = tile; }
+};
+
+struct BresenhamLine
+{
+    struct const_iterator
+    {
+        int2 point;
+        Direction mainStep, sideStep;
+        int mainDelta, sideDelta, error;
+
+        bool operator != (const const_iterator & r) const { return point != r.point; }
+        const int2 & operator * () const { return point; }        
+        const_iterator & operator ++ ();
+    } first, last;
+
+    BresenhamLine(int2 a, bool includeA, int2 b, bool includeB);
+    const_iterator begin() const { return first; }
+    const_iterator end() const { return last; }
 };
 
 Map GenerateRandomMap(std::mt19937 & engine);

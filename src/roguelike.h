@@ -27,6 +27,7 @@ struct Color
         case 3: return {0,x,chroma};
         case 4: return {x,0,chroma};
         case 5: return {chroma,0,x};
+        default: assert(false); return {};
         }
     }
 
@@ -83,8 +84,6 @@ struct Rect
 void SetTitle(const char * title);
 void WriteOutput(const Glyph (&glyphs)[SCREEN_HEIGHT][SCREEN_WIDTH], const int2 & cursor);
 int ReadInput();
-
-std::vector<int2> EvaluateBresenhamLine(int2 a, bool includeA, int2 b, bool includeB);
 
 extern int GameMain();
 

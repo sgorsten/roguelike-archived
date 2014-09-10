@@ -10,10 +10,38 @@ const Tile::Type Tile::types[NUM_TILES] = {
     {{Color::Brown, '/'}, true, "open door"}
 };
 
+BresenhamLine::const_iterator & BresenhamLine::const_iterator::operator ++ ()
+{
+    point += mainStep;
+    error -= sideDelta;
+    if(error < 0)
+    {
+        point += sideStep;
+        error += mainDelta;
+    }
+    return *this;
+}
+
+BresenhamLine::BresenhamLine(int2 a, bool includeA, int2 b, bool includeB)
+{
+    int mainDelta = abs(b.x - a.x), sideDelta = abs(b.y - a.y);
+    Direction mainStep = a.x < b.x ? Direction::East : Direction::West, sideStep = a.y < b.y ? Direction::South : Direction::North;
+    if(abs(b.y - a.y) > abs(b.x - a.x))
+    {
+        std::swap(mainDelta, sideDelta);
+        std::swap(mainStep, sideStep);
+    }
+
+    first = {a,mainStep,sideStep,mainDelta,sideDelta,mainDelta/2};
+    last = {b,mainStep,sideStep,mainDelta,sideDelta,mainDelta/2};
+    if(includeB) ++last;
+    if(!includeA && first != last) ++first;
+}
+
 static bool CheckLineOfSight(const Map & map, const int2 & viewer, const int2 & target, bool isNeighbor)
 {
     if(isNeighbor && !map.GetTile(target).IsWalkable()) return false;
-    for(auto point : EvaluateBresenhamLine(viewer, false, target, isNeighbor))
+    for(auto point : BresenhamLine(viewer, false, target, isNeighbor))
     {
         if(!map.GetTile(point).IsWalkable()) // For now, assume unwalkable tiles block visibility
         {
